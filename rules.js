@@ -143,12 +143,32 @@
   const nonEsterPrefix = /^(?:sodium|potassium|magnesium|calcium|zinc|aluminum|aluminium|disodium|dipotassium|ammonium)\s/i;
   const acylTenside = /^(?:sodium|potassium|disodium|magnesium|calcium|ammonium)\s+(?:methyl\s+)?(?:cocoyl|lauroyl|palmitoyl|stearoyl|myristoyl|oleoyl)\b/i;
   const saltSuffix = /^(?:sodium|potassium|magnesium|calcium|zinc|aluminum|aluminium)\s+(?:stearate|palmitate|oleate|laurate|myristate|behenate|isostearate)$/i;
+  // Exact raw-label aliases preserve punctuation and parenthetical text so one
+  // confirmed composite label does not broaden every similarly normalized name.
+  function rawAliasKey(value) {
+    return String(value || '').normalize('NFKC').replace(/\u00a0/g, ' ').toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+  const rawAliases = new Map();
+  function addRawAlias(alias, reference) {
+    const key = rawAliasKey(alias);
+    if (!key || rawAliases.has(key)) throw new Error('Duplicate or empty raw ingredient alias: ' + alias);
+    rawAliases.set(key, reference);
+  }
+  addRawAlias('Polysorbate-80', 'Polysorbate 80');
+  addRawAlias(`Beeswax/Cera Alba/Cire d'abeille`, 'Beeswax');
+  addRawAlias('Butyrospermum Parkii (Shea Butter)', 'Shea Butter');
+  addRawAlias('Cera Microcristallina (Microcrystalline Wax,Cire Microcristalline)', 'Microcrystalline Wax');
+
   // Volatile aromatic/essential oils must NOT be flagged merely because their name contains "oil".
   // This tool does not assess nonspecific irritation or contact allergy.
   const volatileOilNames = new Set(`Mentha Piperita Oil|Mentha Arvensis Leaf Oil|Eucalyptus Globulus Leaf Oil|Lavandula Angustifolia Oil|Melaleuca Alternifolia Leaf Oil|Tea Tree Oil|Citrus Limon Peel Oil|Citrus Aurantium Dulcis Peel Oil|Citrus Bergamia Peel Oil|Rosmarinus Officinalis Leaf Oil|Thymus Vulgaris Oil|Cymbopogon Citratus Leaf Oil|Peppermint Oil|Lavender Oil|Eucalyptus Oil|Rosemary Oil|Lemon Peel Oil|Bergamot Oil|Essential Oil`.split('|').map(normalize));
   const volatileOilPattern = /(?:leaf|peel|flower|herb|bark|wood|needle|flower bud)\s+oil$|^(?:tea tree|peppermint|eucalyptus|lavender|rosemary|bergamot|thyme|lemon|lemongrass)\s+(?:essential\s+)?oil$|\bessential oil$/;
 
   function matchOne(value) {
+    const rawAlias = rawAliasKey(value);
+    if (rawAliases.has(rawAlias)) {
+      return matchOne(rawAliases.get(rawAlias));
+    }
     const key = normalize(value);
     if (!key) return null;
     if (exact.has(key)) return {...exact.get(key), match: 'Exact list'};
@@ -188,5 +208,5 @@
     return {ingredients:analyzed, matches, counts, highest, total:names.length, withoutMatch:names.length - matches.length, strict};
   }
 
-  return {SOURCES, normalize, parseIngredients, matchOne, analyze, knownCount:exact.size};
+  return {SOURCES, normalize, parseIngredients, matchOne, analyze, knownCount:exact.size + rawAliases.size, rawAliasCount:rawAliases.size};
 });

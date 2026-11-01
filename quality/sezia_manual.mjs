@@ -51,7 +51,16 @@ while ((addMatch = addPattern.exec(ruleSource))) {
 }
 assert.ok(rawRegistryCount > 400, 'captured the expected rule alias registry');
 const normalizedRegistryKeys = new Set(rawRegistryLabels.map(name => R.normalize(name)).filter(Boolean));
-assert.equal(normalizedRegistryKeys.size, R.knownCount, 'raw add literals cover the entire normalized exact-rule map');
+const rawAliasPattern = /\baddRawAlias\(\s*(['\x60])([\s\S]*?)\1\s*,/g;
+const rawAliasLabels = [];
+let rawAliasMatch;
+while ((rawAliasMatch = rawAliasPattern.exec(ruleSource))) {
+  const name = rawAliasMatch[2];
+  rawAliasLabels.push(name);
+}
+assert.equal(rawAliasLabels.length, R.rawAliasCount, 'raw alias source literals match the exported alias count');
+const normalizedRegisteredKeys = new Set([...rawRegistryLabels, ...rawAliasLabels].map(name => R.normalize(name)).filter(Boolean));
+assert.equal(normalizedRegisteredKeys.size, R.knownCount, 'raw add literals and raw alias literals cover the complete known-name count');
 
 const neutralMatch = ruleSource.match(/const NEUTRAL = new Set\([\x60]([\s\S]*?)[\x60]\.split\('\|'\)\.map\(normalize\)\);/);
 assert.ok(neutralMatch, 'captured the raw NEUTRAL set');
@@ -132,6 +141,7 @@ while ((appMatch = appFixture.exec(appTestSource))) {
   const inci = appMatch[1].replace(/\\n/g, '\n').replace(/\\'/g, "'");
   for (const name of R.parseIngredients(inci)) addLabel(name, 'app.test.js:input fixture');
 }
+for (const name of rawAliasLabels) addLabel(name, 'rules.js:raw alias');
 
 const excluded = [];
 for (const [key, entry] of labels) {
@@ -157,7 +167,7 @@ for (const entry of entries) {
   assert.ok(!/^unknown(?:$|[\s_-]|[A-Z0-9])/i.test(entry.label), 'unknown placeholders are excluded');
 }
 const entryKeys = new Set(entries.map(entry => entry.key));
-for (const name of [...rawRegistryLabels, ...neutralNames, ...volatileNames]) {
+for (const name of [...rawRegistryLabels, ...rawAliasLabels, ...neutralNames, ...volatileNames]) {
   assert.ok(entryKeys.has(conservativeKey(name)), 'raw rule label retained: ' + name);
 }
 
@@ -229,6 +239,7 @@ const expected = {
     source_counts: {
       rules_add_raw_alias_occurrences: rawRegistryCount,
       rules_add_normalized_unique_names: normalizedRegistryKeys.size,
+    rules_raw_alias_count: rawAliasLabels.length,
       neutral_names: neutralNames.length,
       volatile_oil_names: volatileNames.length,
       rules_test_positive: rulesFixtures.positive.length,
@@ -255,8 +266,19 @@ const expected = {
 const payloadFile = path.join(root, 'quality/SEZIA_INGREDIENTS.txt');
 const expectedFile = path.join(root, 'quality/sezia_manual_expected.json');
 const guideFile = path.join(root, 'quality/SEZIA_MANUAL_GUIDE.md');
-fs.writeFileSync(payloadFile, payload + '\n', 'utf8');
-fs.writeFileSync(expectedFile, JSON.stringify(expected, null, 2) + '\n', 'utf8');
+const payloadText = payload + '\n';
+const expectedText = JSON.stringify(expected, null, 2) + '\n';
+function assertHistoricalSnapshotUnchanged(filename, generatedText) {
+  if (!fs.existsSync(filename)) return;
+  const current = fs.readFileSync(filename);
+  if (!current.equals(Buffer.from(generatedText, 'utf8'))) {
+    throw new Error('Refusing to overwrite ' + path.relative(root, filename) + ': historical snapshot differs from current rule output; historical snapshot is kept unchanged.');
+  }
+}
+assertHistoricalSnapshotUnchanged(payloadFile, payloadText);
+assertHistoricalSnapshotUnchanged(expectedFile, expectedText);
+fs.writeFileSync(payloadFile, payloadText, 'utf8');
+fs.writeFileSync(expectedFile, expectedText, 'utf8');
 fs.writeFileSync(guideFile, guide + '\n', 'utf8');
 
 const payloadWritten = fs.readFileSync(payloadFile, 'utf8').replace(/\n$/, '');

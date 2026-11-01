@@ -7,7 +7,7 @@ Updated: 2026-11-01. The scope is limited to potential **Malassezia** or **sebor
 | Suite | Result | Meaning |
 |---|---|---|
 | `app.test.js` | Passed | App state, changed-input invalidation, copy behavior, re-analysis, and mode-note wording. |
-| `rules.test.js` | 98 assertions passed | Includes negative controls for fragrance, alcohol, allergens, preservatives, and detergent irritancy. |
+| `rules.test.js` | 159 assertions passed | Includes four exact alias regressions, frozen 1,432-label scope comparison, and negative controls for fragrance, alcohol, allergens, preservatives, and detergent irritancy. |
 | `benchmark.test.js` | 58 cases passed | 50 individually selected names, 6 real manufacturer-listed full formulas, and 2 parsing tests. |
 | `quality/sezia_examples.test.js` | 123/123 passed | Unique examples copied from Sezia's *published category pages*; **not** actual Sezia live responses. |
 | `quality/real100.test.mjs` | Passed | Offline CLI checks with 100 explicitly synthetic CSV rows; source/formula hash validation, stale template preservation, and malformed annotation rejection. |
@@ -18,7 +18,7 @@ Updated: 2026-11-01. The scope is limited to potential **Malassezia** or **sebor
 
 ## Returned manual union comparison
 
-A single copy-ready payload contains **1,432** distinct labels (35,256 characters), with provenance and per-label local strict/balanced findings in `sezia_manual_expected.json`. Its payload SHA-256 is `5244c9a78e26505b0ec6a47ce9d9b4093227eb42222d952b8b5c13591f8a27ae`. The returned Sezia output reports 436 entries: **434 exact label matches and 2 unresolved fragments**. It has no visible Unverified section. See the complete label-level comparison and mismatch lists in [SEZIA_COMPARISON.md](SEZIA_COMPARISON.md) and [sezia_manual_comparison.json](sezia_manual_comparison.json). Local expected ratings are checker outputs, not Sezia observations. This is one ingredient-union response, not product-formula validation; historical formula-level live coverage remains **0/100**. Possible output truncation and rule-review candidates remain open. See [the manual guide](SEZIA_MANUAL_GUIDE.md) and [payload](SEZIA_INGREDIENTS.txt).
+A single copy-ready payload contains **1,432** distinct labels (35,256 characters), with provenance and the original per-label local strict/balanced findings in `sezia_manual_expected.json`. Its payload SHA-256 is `5244c9a78e26505b0ec6a47ce9d9b4093227eb42222d952b8b5c13591f8a27ae`. The returned Sezia output reports 436 entries: **434 exact label matches and 2 unresolved fragments**. It has no visible Unverified section. The original label-level comparison and mismatch lists are in [SEZIA_COMPARISON.md](SEZIA_COMPARISON.md) and [sezia_manual_comparison.json](sezia_manual_comparison.json). Four exact aliases were corrected after that frozen comparison; those current outcomes are shown separately in the report, without rewriting its 421/13/132 historical Strict counts. Local expected ratings are checker outputs, not Sezia observations. This is one ingredient-union response, not product-formula validation; historical formula-level live coverage remains **0/100**. Possible output truncation and the remaining rule-review candidates remain open. See the [manual guide](SEZIA_MANUAL_GUIDE.md) and [payload](SEZIA_INGREDIENTS.txt).
 ## How to run tests
 
 ```bash

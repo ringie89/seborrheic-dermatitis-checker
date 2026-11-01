@@ -1,6 +1,6 @@
 # Manuelle Sezia-Sammelausgabe: Abgleich
 
-Stand: 2026-11-01. Eine vom Nutzer zurückgegebene Sezia-Ausgabe wurde mit den erwarteten lokalen Label-Einstufungen verglichen. Das ist ein Abgleich von Ingredient-Namen, keine Prüfung vollständiger Produktformeln und keine klinische Validierung. Produktregeln wurden nicht geändert.
+Stand: 2026-11-01. Eine vom Nutzer zurückgegebene Sezia-Ausgabe wurde mit den damals erwarteten lokalen Label-Einstufungen verglichen. Das ist ein Abgleich von Ingredient-Namen, keine Prüfung vollständiger Produktformeln und keine klinische Validierung. Die nachträglich beschlossenen, eng begrenzten Alias-Korrekturen sind separat unter „Korrekturen nach dem Snapshot“ dokumentiert; die ursprüngliche Messung wurde nicht überschrieben.
 
 ## Eingabe und Zuordnung
 
@@ -17,7 +17,7 @@ Das vollständige rohe Ausgabe-Textdokument wird nicht in diesem Bericht wiederh
 
 Der Nenner für die Ausgabe ist 434 exakt zugeordnete Labels; zwei Fragmente bleiben außerhalb des Vergleichs. Die Listen der 13 bzw. 132 Strict-Abweichungen und der 73 bzw. 41 Balanced-Abweichungen sowie lokale Regelgruppen sind im JSON vollständig aufgeführt. Das sind **keine** Präzisions-, Recall- oder Fehlerquoten. Nicht aufgeführte Labels sind keine bestätigten Sezia-Negativbefunde und gelten nicht dadurch als sicher. Insbesondere fehlt ein sichtbarer „Unverified“-Abschnitt. Sezia-Kategorien und lokale Regelgruppen sind außerdem nicht zwingend chemisch gleichartige Kategorien.
 
-Die 13 Sezia-Labels ohne lokale Strict-Regel, unverändert aus der Ausgabe übernommen:
+Die folgenden 13 Sezia-Labels hatten im ursprünglichen Snapshot keine lokale Strict-Regel, unverändert aus der Ausgabe übernommen:
 
 | Sezia-Label | Abschnitt |
 |---|---|
@@ -39,15 +39,30 @@ Die 13 Sezia-Labels ohne lokale Strict-Regel, unverändert aus der Ausgabe über
 
 Diese Beobachtungen sind Prüfhinweise, keine automatische Regeländerung oder abschließende Bewertung:
 
-- **Mögliche lokale Überwarnung durch Alias-/Musterlücken:** `Cera Microcristallina (Microcrystalline Wax,Cire Microcristalline)` erhält lokal 2/3 als `oilunknown`, während das alleinstehende `Microcrystalline Wax` in `NEUTRAL` liegt. Die historischen Treffer stammen aus `SRC-0408` und `SRC-0443`; die neutrale Schreibweise aus `SRC-0134`. Das ist eine konkrete interne Alias-Inkonsistenz.
+- **Im Snapshot nachweisbare lokale Überwarnung durch Alias-/Musterlücke:** `Cera Microcristallina (Microcrystalline Wax,Cire Microcristalline)` erhielt 2/3 als `oilunknown`, während das alleinstehende `Microcrystalline Wax` in `NEUTRAL` liegt. Die historischen Treffer stammen aus `SRC-0408` und `SRC-0443`; die neutrale Schreibweise aus `SRC-0134`. Dieser konkrete Aliasfall ist in der späteren Korrektur unten behoben.
 - **Formulierungsabhängiger Review:** `PEG-7 Caprylic/Capric Glycerides` erhält 2/3 als generisches `glycerides`-Muster; `Caprylic/Capric Triglyceride` ist dagegen neutral. Die Namen bezeichnen unterschiedliche Stoffe/Formulierungen. Daraus folgt weder eine Entwarnung noch ein bestätigter Trigger.
 - **Volatile-Öl-/Synonymmuster prüfen:** `Salvia Officinalis (Sage) Oil` sowie mehrere Bergamot-Fruit-Oil-Schreibweisen erhalten lokal 2/3 als `oilunknown`, obwohl die Regelnotiz generische Essential-Oil-Warnungen ausschließt und `Bergamot Oil` neutral ist. Das sind mögliche Whitelist-/Namensmusterlücken; eine Prüfung botanischer Quellen und des Regelumfangs steht aus.
-- **Mögliche Alias- und Erkennungsunterschiede bei Sezia-Labels:** `Polysorbate-80`, `Beeswax/Cera Alba/Cire d'abeille` und `Butyrospermum Parkii (Shea Butter)` sowie die Ester `C10-30 Cholesterol/Lanosterol Esters` und `Hydrolyzed Jojoba Esters` verdienen eine manuelle Regelprüfung. Die zusammengesetzte Schreibweise allein beweist keine fehlende chemische Stofffamilie.
+- **Mögliche Alias- und Erkennungsunterschiede bei Sezia-Labels:** `Polysorbate-80`, `Beeswax/Cera Alba/Cire d'abeille` und `Butyrospermum Parkii (Shea Butter)` erhielten später eng begrenzte Aliasbehandlungen (siehe unten). Die Ester `C10-30 Cholesterol/Lanosterol Esters` und `Hydrolyzed Jojoba Esters` bleiben fachlich offen. Eine zusammengesetzte Schreibweise allein beweist keine fehlende chemische Stofffamilie.
 - **Eingabefehler nicht still reparieren:** `methyl glucose sesquistearatem` und `polysorbate 20 polyglyceryl-3 methylglucose disterarate` sehen nach Schreibfehlern bzw. verklebten Namen aus. Sie wurden im Abgleich nicht normalisiert oder aufgeteilt.
 - **Namensinhalt ist kein Nachweis der Zusammensetzung:** `milk protein`, `milk protein extract` und `goat milk extract` belegen für sich keinen bestimmten Milchfettanteil. `Polyhydroxystearic Acid` ist laut [CIR-Sicherheitsbericht](https://www.cir-safety.org/sites/default/files/FR_PolyhydroxystearicAcid_032023.pdf) ein Polymer aus Hydroxycarbonsäure-Monomeren; der Name ist nicht mit freier Hydroxystearinsäure gleichzusetzen.
 - **Squalene separat von Squalane prüfen:** Studien berichten mechanistische bzw. assoziative Befunde zu Squalenoxidation und Schuppen/Malassezia ([2016](https://pubmed.ncbi.nlm.nih.gov/26842231/), [2023](https://pubmed.ncbi.nlm.nih.gov/36789756/)). Sie belegen keine patientenbezogene Produktvorhersage und rechtfertigen hier keine automatische Regeländerung. Squalene und Squalane sind unterschiedliche Bezeichnungen/Stoffe.
 - **75 Strict-only Salzlabels sind kein bestätigter Bug:** Diese 75 lokal als `salt` markierten Labels sind in der kopierten Trefferliste nicht enthalten; ein eigener Abschnitt „Unverified“ fehlt. Sechs weitere lokale `salt`-Labels werden von Sezia als `Esters` ausgegeben. Sezia beschreibt Salze/Taurate/Isethionate auf der separaten [Unverified-Seite](https://www.sezia.co/ingredients/unverified) als unzureichend erforscht. Kategorien und lokale Regelgruppen sind daher nicht gleichzusetzen.
 
+## Korrekturen nach dem Snapshot
+
+Nach dem Root-Review wurden ausschließlich vier exakt beobachtete Schreibweisen an bereits bestehende Referenzverhalten gebunden:
+
+| Label | Eingefrorener Snapshot | Aktuelle lokale Regel |
+|---|---|---|
+| `Polysorbate-80` | 0/3 | 2/3 `ester`, wie `Polysorbate 80` |
+| `Beeswax/Cera Alba/Cire d'abeille` | 0/3 | 3/3 `lipid`, wie `Beeswax` |
+| `Butyrospermum Parkii (Shea Butter)` | 0/3 | 3/3 `lipid`, wie `Shea Butter` |
+| `Cera Microcristallina (Microcrystalline Wax,Cire Microcristalline)` | 2/3 `oilunknown` | 0/3, wie `Microcrystalline Wax` (`NEUTRAL`) |
+
+Ein Korpusvergleich gegen die eingefrorenen 1.432 lokalen Erwartungslabels fand genau vier Strict- und drei Balanced-Änderungen an Rating/Gruppe. Die Balanced-Einstufung des Cera-Microcristallina-Labels war bereits 0/3, weil die frühere `oilunknown`-Heuristik dort unterdrückt wurde; die neue Neutralbehandlung entfernt diese heuristische Unterdrückung ohne Änderung des sichtbaren Balanced-Ratings. Die offenen Vergleichsfälle in diesem Bericht wurden nicht neu eingestuft.
+
+`SEZIA_INGREDIENTS.txt`, `sezia_manual_expected.json`, `sezia_manual_comparison.json` und die Nutzerquelle blieben bytegleich. Der Generator `sezia_manual.mjs` lehnt geänderte Ableitungen jetzt vor sämtlichen Datei-Schreibvorgängen mit „historical snapshot is kept unchanged“ ab. Der einmalige Guardlauf endete erwartungsgemäß am veränderten Expected-Snapshot; Payload, Expected, Vergleich, Anleitung und Nutzerquelle behielten ihre Vorher-Hashes.
+
 ## Grenzen und nächster Schritt
 
-Der einzelne Sammelvergleich ist für 1/1 manuelle Antwort abgeschlossen; die historische Formelvalidierung bleibt separat bei 0/100 gültigen Live-Ergebnissen. Die zwei Fragmente, mögliche Ausgabeabschneidung und die genannten Regelkandidaten müssen fachlich geprüft werden. Bis zu einem separaten Review bleiben die Projektregeln unverändert. Die lokale Auswertung enthält keine klinische Ground Truth und sagt nichts über die Verträglichkeit eines konkreten Produkts aus.
+Der einzelne Sammelvergleich bleibt eine 1/1 manuelle Antwort; die historische Formelvalidierung bleibt separat bei 0/100 gültigen Live-Ergebnissen. Zwei Fragmente, mögliche Ausgabeabschneidung und die offenen fachlichen Fälle müssen weiter geprüft werden. Die lokale Auswertung enthält keine klinische Ground Truth und sagt nichts über die Verträglichkeit eines konkreten Produkts aus.

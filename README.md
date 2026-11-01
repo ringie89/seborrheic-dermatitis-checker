@@ -62,7 +62,9 @@ There are no external dependencies.
 
 **Important validation distinction:** Sezia's public homepage and published ratings page responded to read-only requests. One ordinary public-form submission returned HTTP 200 with a generic error message and no ingredient assessment. The comparison in this section uses Sezia's **published ingredient categories, matching requirements, and examples**; it is **not** a measured head-to-head live scan and cannot establish an overall percentage agreement with Sezia. Valid product-formula coverage remains 0/100. The separate manual union output was received and compared: 436 reported entries, 434 exact labels mapped, and 2 unresolved fragments. See [the comparison](quality/SEZIA_COMPARISON.md) and [external validation status](quality/VALIDATION_STATUS.md).
 
-`benchmark.test.js` includes **50 ingredient-level comparison and edge cases, six real manufacturer-listed ingredient formulas, and two parsing tests**. Along with the 98 assertions in `rules.test.js` and the app-state checks in `app.test.js`, these are executable regression checks—not clinical accuracy estimates.
+Four explicitly observed ingredient aliases have since been aligned with their existing reference labels. The historical 1,432-label expected-results and comparison files remain frozen at the pre-correction state; the separate current outcomes are documented in the comparison report. No general fuzzy or parenthetical matching rule was added.
+
+`benchmark.test.js` includes **50 ingredient-level comparison and edge cases, six real manufacturer-listed ingredient formulas, and two parsing tests**. Along with the 159 assertions in `rules.test.js` and the app-state checks in `app.test.js`, these are executable regression checks—not clinical accuracy estimates.
 
 | Manufacturer-listed product | Strict rating | Flagged ingredients | Key findings |
 |---|---:|---:|---|
