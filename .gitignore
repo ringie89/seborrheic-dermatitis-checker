@@ -1,0 +1,37 @@
+# Local secrets and environment files. Example templates remain trackable.
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Operating system and editor files.
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Local caches, dependencies, and temporary files.
+node_modules/
+.npm/
+.cache/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.coverage
+htmlcov/
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+
+# Generated audit outputs (source data and checked-in fixtures remain included).
+quality/REAL_100_REPORT.md
+quality/real_100_results.json
+quality/sezia_observations_template.csv
+quality/sezia_observations_template-*.csv
+quality/real-product-audit-output/

@@ -1,0 +1,45 @@
+name: Ingredient checker quality checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Browser app state and copy behavior
+        run: node app.test.js
+      - name: Legacy INCI rules
+        run: node rules.test.js
+      - name: Manufacturer formulas and documented categories
+        run: node benchmark.test.js
+      - name: 123 unique published Sezia ingredient examples
+        run: node quality/sezia_examples.test.js
+      - name: Offline real-product annotation integrity
+        run: node quality/real100.test.mjs
+      - name: 100 controlled complete INCI lists
+        run: node quality/scenarios.test.js
+
+  real-product-audit:
+    # Intentionally manual. Source may change; results require human review.
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build report from 100 externally sourced commercial formulations
+        run: node quality/real100.mjs --output-dir quality/real-product-audit-output
+      - uses: actions/upload-artifact@v4
+        with:
+          name: seborrheic-dermatitis-100-product-audit
+          path: quality/real-product-audit-output/
+          retention-days: 30

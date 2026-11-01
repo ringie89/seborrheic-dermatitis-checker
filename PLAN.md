@@ -1,0 +1,83 @@
+# Umsetzungsplan
+
+Stand: 2026-11-01
+
+## Ziel
+
+Die bestätigten Probleme in der lokalen Produktprüfung und in der Benchmark-Verwaltung gezielt beheben, Regressionen absichern und die Projektänderungen nachvollziehbar veröffentlichen. Eine externe Validierung anhand historischer Produktrezepturen und tatsächlicher Sezia-Live-Ergebnisse bleibt ein späterer, separat ausgewiesener Schritt. Es werden keine Validierungsergebnisse vorweggenommen oder erfunden.
+
+## Ausgangsstand
+
+- Statische, clientseitige Website ohne Build-Schritt oder externe Laufzeitabhängigkeiten. `rules.js` enthält Parser und Bewertungsregeln; `app.js` steuert Oberfläche und Ergebniszustand.
+- Bei Änderung der Zutatenliste wird aktuell nur der Zähler aktualisiert. Sichtbare Ergebnisse und „Copy results“ können sich weiterhin auf die vorherige Eingabe beziehen.
+- Der Parser trennt auch an Kommata innerhalb von Klammerzusätzen.
+- Balanced-Modus blendet auch Galactomyces-Regeln aus, ohne dies in der Modusnotiz ausdrücklich zu nennen.
+- Der optionale 100-Formeln-Runner ordnet Annotationen über Zeilen-IDs zu und bindet sie nicht verbindlich an den Inhalt der Formel beziehungsweise die Quelldatei.
+- Die Sezia-Beispielfixture meldet 124 unterschiedliche Namen, enthält aber einen doppelten Eintrag (`Sodium Cocoyl Isethionate`): 124 Einträge, 123 eindeutige Namen.
+- Bei der Erstaufnahme bestanden die lokalen Ausgangstests unter Node v24.17.0: `rules.test.js` (92 Assertions), `benchmark.test.js` (58 Checks), `quality/sezia_examples.test.js` (124 Fixture-Einträge), `quality/scenarios.test.js` (100 synthetische Listen / 1.785 Assertions). Die aktuellen Ergebnisse nach Schritt 1 stehen unter dessen Abnahme.
+- Die Chromium-Aussage in `COMPARISON.md` wurde bei der Bestandsaufnahme nicht reproduziert. Der historische 100-Formeln-Runner wurde nicht ausgeführt; er benötigt eine externe Quelle oder Eingabedatei und erzeugt Berichtsdateien.
+- Das Arbeitsverzeichnis ist derzeit kein Git-Repository. Eine GitHub-Repository-URL liegt noch nicht vor.
+
+## Arbeitsschritte und Abnahmekriterien
+
+### 1. Ergebniszustand, Parser und Modustransparenz
+
+- [x] Festlegen und implementieren, wie eine nachträglich geänderte Zutatenliste den zuvor angezeigten Bericht behandelt. Ein kopierter Bericht darf nicht stillschweigend zu einer inzwischen geänderten Eingabe gehören; Zustand und Oberfläche müssen übereinstimmen.
+- [x] Den Parser so anpassen, dass Kommas innerhalb geklammerter Zusätze nicht als Listentrenner behandelt werden, während übliche Komma-, Semikolon- und Zeilenumbruchlisten weiterhin korrekt verarbeitet werden.
+- [x] Balanced-Modus-Notiz und passende Erklärungen in der Oberfläche/Dokumentation so präzisieren, dass die Unterdrückung von Galactomyces (3/3 im strikten Modus) erkennbar ist.
+- [x] Gezielte Regressionstests ergänzen: Eingabe nach abgeschlossener Analyse ändern und Berichtszustand prüfen; Kommas innerhalb und außerhalb von Klammern; strikte und ausgewogene Ergebnisse für Galactomyces, 1/3-Treffer und unsichere Öl-Heuristiken.
+
+**Abnahme:** Die neue Eingabe und ein verfügbarer Kopierbericht können nicht auseinanderlaufen. Parenthesierte Kommas beschädigen die Ingredient-Tokens nicht; Listentrenner funktionieren weiterhin. Nutzer sehen klar, welche Warnklassen Balanced-Modus ausblendet. Alle neuen Regressionstests bestehen.
+
+**Ergebnis Schritt 1 — umgesetzt und vom Root-Reviewer freigegeben:** Eingabeänderung blendet die bisherige Analyse aus, verwirft den Kopierzustand und zeigt einen Hinweis zum erneuten Prüfen. Der Parser erhält Kommas, Semikolons und Bullet-Zeichen innerhalb balancierter Klammern; echte Zeilenumbrüche bleiben Trenner, Ziffernkommas bleiben geschützt. Strict/Balanced-Hinweise und passende englische Website-Texte nennen die ausgeblendeten Galactomyces- und unbekannten Öl/Wachs-Muster.
+
+**Regressionsergebnisse (Node v24.17.0):** `node app.test.js` bestanden (DOM-Stub prüft Invalidierung, blockierten alten Bericht, erneute Analyse und 0/3-Kopierbericht); `node rules.test.js` **98** Assertions bestanden; `node benchmark.test.js` **58** Checks bestanden; `node quality/sezia_examples.test.js` **124** Fixture-Einträge bestanden; `node quality/scenarios.test.js` **100** synthetische Listen / **1.785** Assertions bestanden. Die zusätzliche Chromium-Prüfung wurde in diesem Schritt nicht wiederholt. Externe Validierung bleibt offen.
+
+### 2. Formelstabile Benchmark-Annotationen und Fixture-Korrektur
+
+- [x] Annotationen an stabile Produkt-/Formelidentität binden, einschließlich Prüfsumme des Zutatenlisteninhalts und Herkunfts-/Datensatzkennung. Eine nicht passende Quelldatei oder Formel muss erkannt und darf nicht stillschweigend mit alten Beobachtungen verglichen werden.
+- [x] Vorlagen eindeutig versionieren oder bei abweichendem Datensatz neu ausgeben, ohne vorhandene Nutzerannotation unbemerkt zu überschreiben. Ungültige, doppelte oder nicht zuordenbare Annotationen sollen verständlich gemeldet werden.
+- [x] Offline-Regressionstests ergänzen, die unveränderte Formeln akzeptieren und geänderte Formel, geänderte Quelle sowie doppelte oder veraltete Identitäten zurückweisen. Die Tests dürfen keinen Netzwerkzugriff benötigen.
+- [x] Den doppelten Sezia-Fixture-Namen entfernen oder durch ein anderes belegtes, eindeutiges öffentliches Kategoriebeispiel ersetzen. Die Fixture-Prüfung soll Eindeutigkeit erzwingen und die tatsächliche Anzahl ausweisen.
+- [x] Zählungen und Aussagen in `quality/QUALITY_SUMMARY.md`, `COMPARISON.md` und `README.md` anhand der korrigierten Fixture aktualisieren.
+
+**Abnahme:** Jede Live-Beobachtung wird nur derselben Formel und Quelldatenbasis zugeordnet, für die sie erhoben wurde; Abweichungen brechen mit nachvollziehbarer Meldung ab. Fixture und Dokumentation stimmen in Anzahl und Eindeutigkeit überein. Offline-Tests decken diese Bedingungen ab.
+
+**Ergebnis Schritt 2 — umgesetzt:** `real100.mjs` schreibt source-hash-spezifische Vorlagen mit erforderlichen `source_sha256`- und `formula_sha256`-Spalten. Annotations-IDs und beide Prüfsummen werden gegen den aktuellen Lauf geprüft; fehlende Hashes/Spalten, veraltete Quellen/Formeln, unbekannte oder doppelte IDs, ungültige `reviewed`-Werte sowie ungültiges/abgeschnittenes CSV werden mit Zeilenhinweisen abgelehnt. Eine veränderte vorhandene Vorlage wird erkannt und nicht überschrieben. `--output-dir` isoliert Bericht, JSON und Vorlage. Der Fixture-Duplikatname wurde entfernt; jetzt sind es **123 eindeutige Beispiele**. README, Vergleich, Qualitätsübersicht und Workflow sind synchronisiert. Annotation-CSV-Felder müssen einzeilig sein; eingebettete Zeilenumbrüche werden ausdrücklich abgelehnt.
+
+### 3. Review und Regression
+
+- [x] Änderungen und Tests gemeinsam auf Randfälle, verständliche UI-Texte und konsistente Dokumentation prüfen. **Root-Review für Schritte 2 und 3 bestanden.**
+- [x] Alle fünf vorhandenen lokalen Suiten und die neue hermetische CLI-Testsuite ausführen.
+- [x] Chromium-Desktop-/Mobile-Prüfungen wurden nicht wiederholt; die Dokumentation kennzeichnet den früher berichteten Pass als historisch.
+- [x] Die Ergebnisse mit ausgeführten Befehlen, Zahlen und bekannten Grenzen festhalten. Keine klinische Genauigkeit oder Live-Sezia-Übereinstimmung aus lokalen Regressionstests ableiten.
+
+**Abnahme:** Alle lokalen Regressionen bestehen; Abweichungen und nicht ausgeführte externe/UI-Prüfungen sind explizit dokumentiert. Der Reviewer kann die Änderungen anhand des Diffs und der Testausgaben nachvollziehen.
+
+**Lokaler Schritt-3-Stand:** `node app.test.js`, `node rules.test.js` (**98**), `node benchmark.test.js` (**58**), `node quality/sezia_examples.test.js` (**123 eindeutige Beispiele**), `node quality/scenarios.test.js` (**100 synthetische Listen / 1.785 Assertions**) und `node quality/real100.test.mjs` (Offline-CLI-Integration mit **100 ausdrücklich synthetischen CSV-Zeilen**) bestanden. Root-Review für Schritte 2 und 3 bestanden. Chromium wurde nicht erneut ausgeführt; historische Produktdaten und Sezia-Livevergleiche wurden nicht abgerufen oder ausgeführt.
+
+### 4. GitHub anbinden und ersten Push durchführen
+
+- [x] Repository-URL erhalten: `https://github.com/ringie89/seborrheic-dermatitis-checker.git`. Read-only `git ls-remote --heads --tags origin` war erfolgreich und lieferte keine Refs; das Remote ist leer. Eine unauthentifizierte GitHub-Metadatenabfrage ergab HTTP 404, daher bleibt die Sichtbarkeit unbestätigt.
+- [x] Lokal Branch `main` initialisiert, `origin` exakt auf die bereitgestellte URL gesetzt, `.gitignore` ergänzt, bekannte Projektdateien explizit gestaged und den Staging-Stand auf Geheimnis-Muster geprüft. Git-Identität wurde nur lokal im Repository mit dem vom Nutzer gewählten GitHub-Login und ID-basierten noreply-Format eingerichtet. Es gibt noch keinen Commit oder Push.
+- [ ] Commit und Push erst nach Root-Review ausführen. Die GitHub-Repository-Sichtbarkeit ist unbestätigt; keine Sichtbarkeit ändern.
+- [ ] Repository-Sichtbarkeit weiter als unbestätigt behandeln; keine Sichtbarkeit ändern und nicht pushen, solange Root-Review oder benötigte Git-Identität fehlt.
+
+**Abnahme:** Noch offen. Der erste Push muss den reviewed Stand einschließlich Tests und Dokumentation enthalten; der lokale Commit muss dem gepushten Commit entsprechen.
+
+**Offene Voraussetzungen:** Repository-URL und lokale Git-Identität liegen vor. Die GitHub-Repository-Sichtbarkeit bleibt wegen HTTP 404 der unauthentifizierten Metadatenabfrage unbestätigt. Commit und Push warten auf Root-Freigabe.
+
+### 5. Spätere externe Validierung: historische Formeln und Sezia live
+
+- [ ] Als getrennten späteren Schritt entscheiden, ob der historische 100-Formeln-Lauf durchgeführt werden soll. Datensatz, Abrufdatum beziehungsweise lokale Quelldatei und SHA-256, Auswahlregel, Parsergrenzen und erzeugte Resultate dokumentieren.
+- [ ] Für einen echten Sezia-Vergleich dieselben exakt dokumentierten Zutatenlisten manuell in Sezia prüfen und die tatsächlich beobachteten Resultate formularstabil annotieren. Keine aus veröffentlichten Kategorien abgeleiteten oder vermuteten Antworten als Live-Ergebnisse eintragen.
+- [ ] Abdeckung, fehlende Beobachtungen und Zählermetriken mit Nennern ausweisen. Historische Daten, veraltete Formeln, nicht ausgeführte Scans und fehlende Sezia-Beobachtungen klar kennzeichnen.
+- [ ] Resultate separat reviewen und klar als Ingredient-Matching-Vergleich ausweisen, nicht als klinische Validierung oder persönliche Verträglichkeitsprognose.
+
+**Abnahme:** Reproduzierbare Herkunft und vollständige Zuordnung der verglichenen Rezepturen sind belegt. Live-Sezia-Metriken enthalten ausschließlich tatsächlich erhobene Beobachtungen; nicht erhobene Ergebnisse bleiben ausdrücklich offen. Es wird keine klinische Genauigkeit behauptet.
+
+**Offene Voraussetzung:** Diese externe Validierung ist nicht Teil der Implementierungsschritte 1–3 und beginnt erst nach deren Review als separat dokumentierter Schritt.
+
+## Änderungsgrenze dieses Plans
+
+Schritte 1 bis 3 sind umgesetzt, lokal geprüft und vom Root-Reviewer freigegeben. Schritt 4 ist lokal vorbereitet und gestaged; Commit und Push warten auf Root-Freigabe. Die externe Chromium-Prüfung wurde nicht wiederholt; historische Produktdaten und Sezia-Livevergleiche wurden nicht abgerufen oder ausgeführt. Schritt 5 bleibt eine separate spätere Validierung. Bis zur Freigabe erfolgen weder Commit/Push noch externe Datenabrufe.
