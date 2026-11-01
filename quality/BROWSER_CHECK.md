@@ -9,3 +9,7 @@ The check covered the initial page and tabs, Analyze, six-token parsing with a p
 There were no application console errors or uncaught page errors, and the page made no external requests. The only browser resource error was a cosmetic `favicon.ico` 404 from the local server. This was a headless browser check, not a physical smartphone test.
 
 The detailed JSON report and four screenshots remain in the local session artifact directory; they are not tracked in the repository. [Open the browser audit JSON](</C:/Users/Andreas/.codex/visualizations/2026/11/01/01a196f8-4f6f-7bc2-a1ce-0b4829fa30be/browser-audit-report.json>).
+
+## Favicon follow-up (2026-11-01)
+
+After the browser check above, `index.html` gained links to `favicon.svg` and a transparent `favicon.ico` with 16, 32, and 48 pixel frames. A separate loopback-only HTTP check returned 200 for `index.html` and both icon files. The 404 above remains the accurate result for the earlier browser run; the later local state has the icon files.

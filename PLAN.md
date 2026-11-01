@@ -163,3 +163,15 @@ Der Nutzer hat die zuvor gewünschte Pause aufgehoben. Diese eng begrenzte Folge
 **Abnahmekriterien:** Eine Slashkette zählt und erscheint als eine Position; Treffer benennen weiter das Originaltoken. Bekannte vollständige neutrale/exakte chemische Namen können durch Fragmente nicht überschrieben werden. Unter gemischten Slash-Treffern gewinnt der höchste im jeweiligen Modus aktive Kandidat; Balanced blendet keinen niedrigeren sichtbaren Treffer aus, nur weil eine andere Komponente unterdrückt wird. Alle Frozen-Korpus-Abweichungen sind vor der Allowlist-Änderung reviewed und erklärt.
 
 **Abnahme:** Implementierung und Regressionen abgeschlossen. Die sechs lokalen Suiten bestehen; der isolierte Frozen-Korpusvergleich fand keine zusätzlichen Strict-/Balanced-Abweichungen. Root-Code-Review bestanden. Commit-/Push-Umfang ist auf genau die acht freigegebenen Dateien begrenzt; Snapshots und Nutzerdaten bleiben ausgeschlossen.
+
+### 10. Favicon gestalten und integrieren
+
+Der Nutzer wählte nach Sichtung der drei kompakten SVG-Entwürfe das „SD“-Monogramm (Option C). Es verwendet die bestehende Website-Palette (#254765 auf hellem Hintergrund); die verworfenen Schild- und Tropfenentwürfe sowie die Vergleichsübersicht wurden entfernt.
+
+- [x] Drei SVG-Entwürfe mit einer beschrifteten PNG-Vergleichsansicht und 16/32-Pixel-Beispielen erstellt; Option C übernommen und verworfene Entwürfe entfernt.
+- [x] Option C als `favicon.svg` eingebunden und einen transparenten ICO-Fallback mit 16-, 32- und 48-Pixel-PNG-Rahmen ergänzt. `index.html` verweist auf beide Formate.
+- [x] SVG-Parsing, ausgewählte Quelldatei, ICO-Rahmen, Indexlinks und Loopback-HTTP-200 für `index.html`, `favicon.svg` und `favicon.ico` geprüft. Keine externen Requests oder breite Testsuite ausgeführt.
+
+**Ergebnis:** Das SD-Monogramm ist das Standard-Favicon. Es bleibt in 32 Pixeln klar lesbar; die Buchstaben sind bei 16 Pixeln kompakt. Produktregeln, Regressionstests und historische Snapshots blieben unverändert.
+
+**Veröffentlichungsstatus:** Lokaler Commit vorhanden; Push durch automatische Freigabeprüfung abgelehnt, weil Eigentümerschaft und Zielautorisierung nicht als nachgewiesen galten; ausstehend bis expliziter Nutzerfreigabe.
