@@ -51,10 +51,7 @@
     card.append(reason);
     const bottom = div('finding-bottom');
     const evidence = document.createElement('span'); evidence.textContent = f.basis;
-    const source = document.createElement('a');
-    source.href = f.source; source.target = '_blank'; source.rel = 'noopener noreferrer';
-    source.textContent = 'View source ↗';
-    bottom.append(evidence, source);
+    bottom.append(evidence);
     card.append(bottom);
     return card;
   }

@@ -89,8 +89,6 @@ textarea:focus{border-color:#547d9f;outline:3px solid #cfe1f0;outline-offset:0}
 .finding-type{display:inline-block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px}
 .finding p{font-size:12px;color:var(--text);line-height:1.7;margin:0 0 12px}
 .finding-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;color:var(--muted);font-size:11px}
-.finding-bottom a{font-weight:600;text-decoration:none}
-.finding-bottom a:hover{text-decoration:underline}
 .full-list{border:1px solid var(--border);background:#fff;border-radius:7px;padding:20px;margin-top:26px}
 .full-list-title h3{font-size:15px;margin-bottom:5px}
 .full-list-title p{font-size:12px;color:var(--muted);margin-bottom:14px}
