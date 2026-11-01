@@ -49,7 +49,7 @@ Die bestätigten Probleme in der lokalen Produktprüfung und in der Benchmark-Ve
 
 - [x] Änderungen und Tests gemeinsam auf Randfälle, verständliche UI-Texte und konsistente Dokumentation prüfen. **Root-Review für Schritte 2 und 3 bestanden.**
 - [x] Alle fünf vorhandenen lokalen Suiten und die neue hermetische CLI-Testsuite ausführen.
-- [x] Chromium-Desktop-/Mobile-Prüfungen wurden nicht wiederholt; die Dokumentation kennzeichnet den früher berichteten Pass als historisch.
+- [x] Im damaligen Schritt 3 wurden die Chromium-Desktop-/Mobile-Prüfungen nicht wiederholt; der frühere Pass war historisch. Die spätere erneute Prüfung ist unter Schritt 8 dokumentiert.
 - [x] Die Ergebnisse mit ausgeführten Befehlen, Zahlen und bekannten Grenzen festhalten. Keine klinische Genauigkeit oder Live-Sezia-Übereinstimmung aus lokalen Regressionstests ableiten.
 
 **Abnahme:** Alle lokalen Regressionen bestehen; Abweichungen und nicht ausgeführte externe/UI-Prüfungen sind explizit dokumentiert. Der Reviewer kann die Änderungen anhand des Diffs und der Testausgaben nachvollziehen.
@@ -79,11 +79,11 @@ Die bestätigten Probleme in der lokalen Produktprüfung und in der Benchmark-Ve
 
 **Ergebnis Schritt 5a:** Der historische Kataloglauf ist dokumentiert in [quality/VALIDATION_STATUS.md](quality/VALIDATION_STATUS.md). Die vereinfachte veröffentlichte Kategorien-Übereinstimmung (258 gemeinsam, 1 nur im Comparator, 74 nur im Checker) ist kein Live-Sezia-Vergleich. Der Quelldatensatz ist lokal hashgesichert, aber wegen ungeklärter Weiterverbreitungsrechte nicht eingecheckt. Es wurden keine Produktregeln geändert.
 
-**Ergebnis Schritt 5b — Sammelantwort abgeglichen und reviewed:** Eine Nutzerrückgabe mit 436 Sezia-Labels wurde auf 434 exakte Namen abgebildet; zwei Fragmente blieben ungelöst und sind als Limit dokumentiert. Die Strict-/Balanced-Abweichungslisten und Reviewkandidaten stehen in [quality/SEZIA_COMPARISON.md](quality/SEZIA_COMPARISON.md) und [quality/sezia_manual_comparison.json](quality/sezia_manual_comparison.json). Die frühere separate SRC-0035-Probe lieferte keine verwertbare Zutatenbewertung. Der vereinbarte Sammel-Namensabgleich ist abgeschlossen; fachliche Detailfälle sind getrennte Folgearbeit. 100 separate Produkt-Liveprüfungen sind kein Abnahmekriterium.
+**Ergebnis Schritt 5b — Sammelantwort abgeglichen und reviewed:** Die unveränderte Nutzerrückgabe enthält 436 Sezia-Labels: 434 exakte Zuordnungen und 2 verkürzte Fragmente im historischen Snapshot. Ein nachträglicher, reproduzierbarer Abgleich mit dem ursprünglichen 1.432-Label-Payload zeigt genau einen vollständigen Payload-Kandidaten je Fragment (Details in [quality/SEZIA_COMPARISON.md](quality/SEZIA_COMPARISON.md)); die Sezia-Rückgabe selbst enthält weiterhin nur die verkürzten Texte. Die Strict-/Balanced-Snapshot-Listen stehen in [quality/SEZIA_COMPARISON.md](quality/SEZIA_COMPARISON.md) und [quality/sezia_manual_comparison.json](quality/sezia_manual_comparison.json). Die frühere separate SRC-0035-Probe lieferte keine verwertbare Zutatenbewertung. Der vereinbarte Sammel-Namensabgleich ist abgeschlossen; die fachliche Prüfung der priorisierten Einzelfälle wurde in Schritt 7 abgeschlossen. Der historische Formel-Livevergleich weist 0/100 gültige Ergebnisse aus; 100 separate Produkt-Liveprüfungen sind kein Abnahmekriterium oder Folgeauftrag.
 
 ### 6. Vier bestätigte Aliasfamilien gezielt angleichen
 
-**Status:** Implementiert und regressionstestgeschützt; Root-Code-Review bestanden. Fachliche Detailprüfung der ausdrücklich offenen Fälle bleibt separat ausstehend. Grundlage ist der reviewed Abgleich in `quality/SEZIA_COMPARISON.md`. Geändert werden ausschließlich diese vier beobachteten Schreibweisen:
+**Status:** Implementiert und regressionstestgeschützt; Root-Code-Review bestanden. Die fachliche Detailprüfung stand beim Abschluss dieses Schritts noch aus und wurde anschließend in Schritt 7 abgeschlossen. Grundlage ist der reviewed Abgleich in `quality/SEZIA_COMPARISON.md`. Geändert werden ausschließlich diese vier beobachteten Schreibweisen:
 
 | Exakte Schreibweise | Sollverhalten | Referenzverhalten |
 |---|---|---|
@@ -101,9 +101,9 @@ Die bestätigten Probleme in der lokalen Produktprüfung und in der Benchmark-Ve
 - [x] Sechs lokale Suiten bestanden: `app.test.js`, `rules.test.js` (**159 Assertions / 436 bekannte Namen und Aliase**), `benchmark.test.js` (**58**), `quality/sezia_examples.test.js` (**123**), `quality/scenarios.test.js` (**1.785 Assertions**) und `quality/real100.test.mjs` (Offline-CLI-Integration).
 - [x] Root-Code-Review bestanden. Keine Änderungen an den historischen Vergleichslabels oder deren ursprünglichem 421/13/132-Vergleich.
 
-**Explizit weiter offen, ohne Einstufungsänderung in diesem Schritt:** `Squalene`, `Polyhydroxystearic Acid`, Milch-/Milchproteinbezeichnungen, `PEG-7 Caprylic/Capric Glycerides`, komplexe Ester sowie volatile botanische Öle. Diese Fälle benötigen getrennte fachliche Prüfung; aus dem Labelabgleich wird keine Bewertung abgeleitet.
+**Zum Abschluss von Schritt 6 noch ohne Einstufungsänderung:** `Squalene`, `Polyhydroxystearic Acid`, Milch-/Milchproteinbezeichnungen, `PEG-7 Caprylic/Capric Glycerides`, komplexe Ester sowie volatile botanische Öle. Die getrennte fachliche Prüfung und ihre Entscheidungen sind in Schritt 7 dokumentiert; aus dem reinen Labelabgleich wird weiterhin keine Bewertung abgeleitet.
 
-**Abnahme:** Erfüllt für die vier Aliasfälle: Referenzfälle und nahe Negativkontrollen sind regressionstestgeschützt, die gemessene Frozen-Korpusänderung ist auf die erwarteten vier Strict-/drei Balanced-Rating-Gruppen begrenzt, alle sechs lokalen Suiten bestehen und historische Artefakte bleiben bytegleich. Der allgemeine `normalize`-Matcher und offene Fachregeln bleiben unverändert.
+**Abnahme:** Erfüllt für die vier Aliasfälle: Referenzfälle und nahe Negativkontrollen sind regressionstestgeschützt, die gemessene Frozen-Korpusänderung ist auf die erwarteten vier Strict-/drei Balanced-Rating-Gruppen begrenzt, alle sechs lokalen Suiten bestehen und historische Artefakte bleiben bytegleich. Der allgemeine `normalize`-Matcher blieb unangetastet; die in Schritt 6 noch offenen Fachfragen wurden in Schritt 7 behandelt.
 
 ### 7. Wissenschaftliche Einzelfallprüfung offener Zutaten
 
@@ -136,6 +136,15 @@ Die bestätigten Probleme in der lokalen Produktprüfung und in der Benchmark-Ve
 
 ## Änderungsgrenze dieses Plans
 
-Schritte 1 bis 4 sind umgesetzt, lokal geprüft beziehungsweise veröffentlicht und vom Root-Reviewer freigegeben. Schritt 4 wurde als Commit `9b4beea` nach `origin/main` gepusht; die Repository-Sichtbarkeit ist unbestätigt und blieb unverändert. Die externe Chromium-Prüfung wurde nicht wiederholt. Schritt 5a (historischer Katalogscan) ist abgeschlossen und reviewed. Die manuelle Sammelausgabe zur 1.432-Label-Liste liegt vor: 436 gemeldete Einträge, 434 exakt zugeordnet und 2 nicht auflösbare Fragmente. Der vereinbarte Sammel-Namensabgleich ist abgeschlossen; 100 separate Produkt-Liveprüfungen sind kein Abnahmekriterium. Schritt 6 korrigiert vier bestätigte Aliasfälle; Root-Code-Review und lokale Regressionen sind bestanden. Die ursprüngliche Sammelauswertung und ihr 421/13/132-Snapshot blieben unverändert. Schritt 7 ist implementiert, lokal geprüft und vom Root-Code-Review freigegeben; alle Fälle sind entschieden oder begründet unverändert. Evidenzentscheidungen, Änderungsumfang und **15 Strict-/6 Balanced-Abweichungen** vom eingefrorenen Erwartungsstand stehen in `quality/INGREDIENT_EVIDENCE_REVIEW.md`. Der Snapshot-Guard hat geänderte Ableitungen abgewiesen, ohne Dateien zu überschreiben. Die nicht wiederholte manuelle Chromium-Prüfung und die zwei ungelösten Fragmente bleiben dokumentierte Grenzen, kein unerledigtes Codework. Dieser Ingredient-Namen-Abgleich ist kein Produktparsing.
+Schritte 1 bis 7 sind umgesetzt, geprüft und wie jeweils dokumentiert reviewed. Schritt 4 wurde als Commit `9b4beea` nach `origin/main` gepusht; die Repository-Sichtbarkeit ist unbestätigt und blieb unverändert. Die erneute Headless-Chromium-Prüfung für Desktop und Mobile bestand; Umfang und Grenzen stehen in [quality/BROWSER_CHECK.md](quality/BROWSER_CHECK.md). Der historische Katalogscan und die einzelne manuelle Sammelabfrage sind dokumentiert; zum historischen Formel-Livevergleich liegen 0/100 gültige Sezia-Ergebnisse vor. Die Sammelausgabe bleibt unverändert bei 436 Einträgen, 434 exakten Zuordnungen und 2 als Rohtext verkürzten Fragmenten; der nachträgliche eindeutige Payload-Abgleich steht in `quality/SEZIA_COMPARISON.md` und ändert den Snapshot nicht. Separate Produkt-Liveprüfungen sind kein Folgeauftrag. Schritt 6 korrigiert vier bestätigte Aliasfälle; Schritt 7 dokumentiert die fachlichen Einzelfallentscheidungen. Die ursprünglichen Payload-, Expected- und Vergleichsdateien blieben unverändert; ihr 421/13/132-Vergleich beschreibt den historischen Vor-Änderungsstand. Evidenzentscheidungen, Änderungsumfang und **15 Strict-/6 Balanced-Abweichungen** vom eingefrorenen Erwartungsstand stehen in `quality/INGREDIENT_EVIDENCE_REVIEW.md`. Der Snapshot-Guard hat geänderte Ableitungen abgewiesen, ohne Dateien zu überschreiben. Dieser Ingredient-Namen-Abgleich ist kein Produktparsing.
 
-**Aktueller Stand:** Schritt 7 ist abgeschlossen. Die Arbeit ist auf Wunsch des Nutzers **PAUSIERT**; es wird kein weiterer Schritt begonnen.
+### 8. Kleine Folgerunde: Dokumentation, Fragmente und Browserprüfung
+
+Der Nutzer hat die zuvor gewünschte Pause aufgehoben. Diese eng begrenzte Folgerunde schließt veraltete Review- und Folgeauftragsformulierungen, dokumentiert die Herkunft der zwei verkürzten Sezia-Texte, und erfasst die erneute Desktop-/Mobile-Prüfung.
+
+- [x] Historische 434-exakt/2-Fragment-Zählung als unveränderten Snapshot erhalten; getrennt davon beide Fragmente gegen den ursprünglichen Payload prüfen.
+- [x] Veraltete Aussagen, dass die fachliche Detailprüfung oder der gesamte Abgleich noch offen sei, als historische Zwischenstände kennzeichnen beziehungsweise auf Schritt 7 verweisen.
+- [x] Headless Chromium Desktop-/Mobile-Prüfung ausführen und die automatisierten Ergebnisse sowie Grenzen dokumentieren.
+- [x] Klarstellen, dass 100 separate Produkt-Liveprüfungen kein Folgeauftrag sind; 0/100 bleibt ausschließlich das Ergebnis der historischen Messung.
+
+**Stand dieser Folgerunde:** Dokumentations- und Fragmentabgleich sowie Browserprüfung abgeschlossen. Keine Produktregeln und keine eingefrorenen Nutzer-/Payload-/Vergleichsdateien wurden geändert.
