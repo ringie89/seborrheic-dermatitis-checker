@@ -16,7 +16,7 @@ Die bestätigten Probleme in der lokalen Produktprüfung und in der Benchmark-Ve
 - Die Sezia-Beispielfixture meldet 124 unterschiedliche Namen, enthält aber einen doppelten Eintrag (`Sodium Cocoyl Isethionate`): 124 Einträge, 123 eindeutige Namen.
 - Bei der Erstaufnahme bestanden die lokalen Ausgangstests unter Node v24.17.0: `rules.test.js` (92 Assertions), `benchmark.test.js` (58 Checks), `quality/sezia_examples.test.js` (124 Fixture-Einträge), `quality/scenarios.test.js` (100 synthetische Listen / 1.785 Assertions). Die aktuellen Ergebnisse nach Schritt 1 stehen unter dessen Abnahme.
 - Die Chromium-Aussage in `COMPARISON.md` wurde bei der Bestandsaufnahme nicht reproduziert. Der historische 100-Formeln-Runner wurde nicht ausgeführt; er benötigt eine externe Quelle oder Eingabedatei und erzeugt Berichtsdateien.
-- Das Arbeitsverzeichnis ist derzeit kein Git-Repository. Eine GitHub-Repository-URL liegt noch nicht vor.
+- Bei der Erstaufnahme war das Arbeitsverzeichnis kein Git-Repository und die GitHub-URL noch nicht bekannt. Der aktuelle Repository-Status steht in Schritt 4.
 
 ## Arbeitsschritte und Abnahmekriterien
 
@@ -59,13 +59,13 @@ Die bestätigten Probleme in der lokalen Produktprüfung und in der Benchmark-Ve
 ### 4. GitHub anbinden und ersten Push durchführen
 
 - [x] Repository-URL erhalten: `https://github.com/ringie89/seborrheic-dermatitis-checker.git`. Read-only `git ls-remote --heads --tags origin` war erfolgreich und lieferte keine Refs; das Remote ist leer. Eine unauthentifizierte GitHub-Metadatenabfrage ergab HTTP 404, daher bleibt die Sichtbarkeit unbestätigt.
-- [x] Lokal Branch `main` initialisiert, `origin` exakt auf die bereitgestellte URL gesetzt, `.gitignore` ergänzt, bekannte Projektdateien explizit gestaged und den Staging-Stand auf Geheimnis-Muster geprüft. Git-Identität wurde nur lokal im Repository mit dem vom Nutzer gewählten GitHub-Login und ID-basierten noreply-Format eingerichtet. Es gibt noch keinen Commit oder Push.
-- [ ] Commit und Push erst nach Root-Review ausführen. Die GitHub-Repository-Sichtbarkeit ist unbestätigt; keine Sichtbarkeit ändern.
-- [ ] Repository-Sichtbarkeit weiter als unbestätigt behandeln; keine Sichtbarkeit ändern und nicht pushen, solange Root-Review oder benötigte Git-Identität fehlt.
+- [x] Lokal Branch `main` initialisiert, `origin` exakt auf die bereitgestellte URL gesetzt, `.gitignore` ergänzt, bekannte Projektdateien explizit gestaged und den Staging-Stand auf Geheimnis-Muster geprüft. Git-Identität wurde nur lokal im Repository mit dem vom Nutzer gewählten GitHub-Login und ID-basierten noreply-Format eingerichtet.
+- [x] Nach Root-Review den initialen Commit `9b4beea` erstellt und `main` ohne Force-Push nach `origin/main` übertragen. Remote-HEAD entsprach danach lokalem HEAD; Arbeitsbaum war sauber.
+- [x] Repository-Sichtbarkeit als unbestätigt dokumentiert und unverändert gelassen.
 
-**Abnahme:** Noch offen. Der erste Push muss den reviewed Stand einschließlich Tests und Dokumentation enthalten; der lokale Commit muss dem gepushten Commit entsprechen.
+**Abnahme:** Erfüllt. Der reviewed Stand einschließlich Tests und Dokumentation wurde gepusht; lokaler und entfernter `main`-Stand waren identisch, der Arbeitsbaum sauber.
 
-**Offene Voraussetzungen:** Repository-URL und lokale Git-Identität liegen vor. Die GitHub-Repository-Sichtbarkeit bleibt wegen HTTP 404 der unauthentifizierten Metadatenabfrage unbestätigt. Commit und Push warten auf Root-Freigabe.
+**Statushinweis:** Repository-URL und lokale Git-Identität liegen vor. Die Sichtbarkeit bleibt wegen HTTP 404 der unauthentifizierten Metadatenabfrage unbestätigt; es wurde keine Sichtbarkeit geändert.
 
 ### 5. Spätere externe Validierung: historische Formeln und Sezia live
 
@@ -80,4 +80,4 @@ Die bestätigten Probleme in der lokalen Produktprüfung und in der Benchmark-Ve
 
 ## Änderungsgrenze dieses Plans
 
-Schritte 1 bis 3 sind umgesetzt, lokal geprüft und vom Root-Reviewer freigegeben. Schritt 4 ist lokal vorbereitet und gestaged; Commit und Push warten auf Root-Freigabe. Die externe Chromium-Prüfung wurde nicht wiederholt; historische Produktdaten und Sezia-Livevergleiche wurden nicht abgerufen oder ausgeführt. Schritt 5 bleibt eine separate spätere Validierung. Bis zur Freigabe erfolgen weder Commit/Push noch externe Datenabrufe.
+Schritte 1 bis 4 sind umgesetzt, lokal geprüft beziehungsweise veröffentlicht und vom Root-Reviewer freigegeben. Schritt 4 wurde als Commit `9b4beea` nach `origin/main` gepusht; die Repository-Sichtbarkeit ist unbestätigt und blieb unverändert. Die externe Chromium-Prüfung wurde nicht wiederholt; historische Produktdaten und Sezia-Livevergleiche wurden nicht abgerufen oder ausgeführt. Schritt 5 bleibt eine separate spätere Validierung.
