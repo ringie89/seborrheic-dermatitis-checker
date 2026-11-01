@@ -22,7 +22,9 @@
     research2025: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12416284/',
     treatment: 'https://www.aad.org/public/diseases/a-z/seborrheic-dermatitis-treatment',
     science: 'https://simpleskincarescience.com/pityrosporum-folliculitis-treatment-malassezia-cure/',
-    squaleneMechanism: 'https://pubmed.ncbi.nlm.nih.gov/36789756/'
+    squaleneMechanism: 'https://pubmed.ncbi.nlm.nih.gov/36789756/',
+    cosmeticIngredientStudy: 'https://doi.org/10.3390/cosmetics6030045',
+    cosmeticIngredientSupplement: 'https://mdpi-res.com/d_attachment/cosmetics/cosmetics-06-00045/article_deploy/cosmetics-06-00045-s001.pdf?version=1564647082'
   });
 
   const GROUP = Object.freeze({
@@ -34,6 +36,8 @@
     ferment: {rating: 1, name: 'Ferment — uncertain Malassezia relevance', reason: 'Sezia includes some non-lipid ferments in a cautious microbiome-related category. A direct effect on Malassezia or seborrheic dermatitis has not been established. Included only in strict mode.', basis: 'Malassezia link uncertain / Sezia precaution', source: SOURCES.ferment},
     salt: {rating: 1, name: 'Unverified Malassezia-related salt', reason: 'Sezia lists this type of fatty-acid-derived salt or acyl compound as unverified. Whether it supplies usable fatty acids to Malassezia or worsens seborrheic dermatitis is unknown. Included only in strict mode.', basis: 'Unverified Malassezia concern', source: SOURCES.unsure},
     mechanistic: {rating: 1, name: 'Preliminary Malassezia mechanism', reason: 'A non-peer-reviewed 2026 preprint reports a single-strain in-vitro hyphal signal with Squalene; published studies link Squalene oxidation products to dandruff models. This does not show that a cosmetic product containing Squalene causes seborrheic dermatitis. Included only in strict mode.', basis: 'Preliminary mechanism / uncertain', source: SOURCES.squaleneMechanism},
+    cetearylGrowth: {rating: 2, name: 'Cetearyl alcohol — experimental growth signal', reason: 'One in-vitro study observed Malassezia growth with cetearyl alcohol, especially for M. furfur. The result is strain-dependent and does not establish a clinical trigger or predict the effect of a finished product.', basis: 'Experimental in-vitro growth signal / species-specific', source: SOURCES.cosmeticIngredientSupplement},
+    mineralOilUncertain: {rating: 1, name: 'Mineral oil — conflicting in-vitro result', reason: 'The supplement to one in-vitro study reports growth on paraffinum liquidum for two M. furfur strains, while the article text says no growth on paraffin-based substances. This conflicting, limited finding is included only as a low-confidence Strict flag, not evidence of a clinical trigger.', basis: 'Conflicting experimental result / Strict-only', source: SOURCES.cosmeticIngredientSupplement},
     oilunknown: {rating: 2, name: 'Oil or wax — check composition', reason: 'Looks like an oil-, wax-, or butter-based lipid. Its specific composition is not covered by the known ingredient list.', basis: 'Heuristic / unverified', source: SOURCES.lipids},
     glycerides: {rating: 2, name: 'Unspecified glyceride blend', reason: 'May contain glycerides of long-chain fatty acids. Since the fatty acid distribution is not stated, this is a formulation-dependent precaution, not a proven trigger.', basis: 'Uncertain lipid composition', source: SOURCES.lipids}
   });
@@ -86,6 +90,12 @@
 
   // Evidence-reviewed exact entries; do not infer from substrings or suffixes.
   add('Squalene', 'mechanistic');
+  // Exact exceptions backed by a strain-specific in-vitro result; do not infer
+  // effects for other fatty alcohols, hydrocarbons, or ingredient families.
+  add('Cetearyl Alcohol', 'cetearylGrowth');
+  // The source text and supplement conflict. Limit the low-confidence rule to
+  // the exact tested liquid-paraffin labels; do not include petrolatum/Paraffin.
+  add('Mineral Oil|Paraffinum Liquidum', 'mineralOilUncertain');
   add('C10-30 Cholesterol/Lanosterol Esters', 'ester', {
     reason:'An ester blend of cholesterol/lanosterol with C10-C30 fatty acids. The chain distribution and Malassezia availability of this specific ingredient are not established. This is a cautious 2/3 ester-category flag, not a proven dermatitis trigger.',
     basis:'Ester blend / uncertain composition',
@@ -104,7 +114,7 @@
 
   // Do not infer feeding from the fact an INCI contains "oil", "glyceryl", "alcohol" etc.
   // Explicit whitelist prevents common false positives in the generic fallback.
-  const NEUTRAL = new Set(`Aqua|Water|Glycerin|Glycerol|Butylene Glycol|Pentylene Glycol|Propanediol|Squalane|PEG-7 Caprylic/Capric Glycerides|Mineral Oil|Paraffinum Liquidum|Petrolatum|Paraffin|Ozokerite|Microcrystalline Wax|Synthetic Wax|Hydrogenated Polyisobutene|Coconut Alkanes|Isostearyl Neopentanoate|Diisostearyl Malate|Diethylhexyl Malate|Caprylic/Capric Triglyceride|Capric/Caprylic Triglyceride|Medium Chain Triglycerides|MCT Oil|Caprylic Acid|Capric Acid|Glyceryl Caprylate|Glyceryl Caprate|Coco-Caprylate|Coco-Caprylate/Caprate|Ethylhexylglycerin|Caprylyl Glycol|Cetearyl Alcohol|Cetyl Alcohol|Stearyl Alcohol|Behenyl Alcohol|Myristyl Alcohol|Arachidyl Alcohol|Dimethicone|Amodimethicone|Cyclopentasiloxane|PEG-12 Dimethicone|PEG-8 Dimethicone|PEG-40 Dimethicone|Niacinamide|Panthenol|Allantoin|Urea|Sodium Hyaluronate|Hyaluronic Acid|Ceramide NP|Ceramide AP|Ceramide EOP|Ceramide NS|Cholesterol|Sodium PCA|Betaine|Piroctone Olamine|Ketoconazole|Ciclopirox Olamine|Ciclopirox|Selenium Sulfide|Salicylic Acid|Citric Acid|Lactic Acid|Sodium Laureth Sulfate|Disodium Laureth Sulfosuccinate|Coco-Glucoside|Decyl Glucoside|Lauryl Glucoside|Phenoxyethanol|Sodium Benzoate|Potassium Sorbate|Disodium EDTA|Sodium Chloride|Zinc PCA|Zinc Pyrithione|Titanium Dioxide|Ethylhexyl Methoxycinnamate|Ethylhexyl Salicylate|Homosalate|Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine|C12-15 Alkyl Benzoate|Acrylates/C10-30 Alkyl Acrylate Crosspolymer|Carbomer|Hydroxyethylcellulose|Polyquaternium-10|Ceteareth-20|Steareth-20|Poloxamer 184|Glyceryl Glucoside`.split('|').map(normalize));
+  const NEUTRAL = new Set(`Aqua|Water|Glycerin|Glycerol|Butylene Glycol|Pentylene Glycol|Propanediol|Squalane|PEG-7 Caprylic/Capric Glycerides|Petrolatum|Paraffin|Ozokerite|Microcrystalline Wax|Synthetic Wax|Hydrogenated Polyisobutene|Coconut Alkanes|Isostearyl Neopentanoate|Diisostearyl Malate|Diethylhexyl Malate|Caprylic/Capric Triglyceride|Capric/Caprylic Triglyceride|Medium Chain Triglycerides|MCT Oil|Caprylic Acid|Capric Acid|Glyceryl Caprylate|Glyceryl Caprate|Coco-Caprylate|Coco-Caprylate/Caprate|Ethylhexylglycerin|Caprylyl Glycol|Cetyl Alcohol|Stearyl Alcohol|Behenyl Alcohol|Myristyl Alcohol|Arachidyl Alcohol|Dimethicone|Amodimethicone|Cyclopentasiloxane|PEG-12 Dimethicone|PEG-8 Dimethicone|PEG-40 Dimethicone|Niacinamide|Panthenol|Allantoin|Urea|Sodium Hyaluronate|Hyaluronic Acid|Ceramide NP|Ceramide AP|Ceramide EOP|Ceramide NS|Cholesterol|Sodium PCA|Betaine|Piroctone Olamine|Ketoconazole|Ciclopirox Olamine|Ciclopirox|Selenium Sulfide|Salicylic Acid|Citric Acid|Lactic Acid|Sodium Laureth Sulfate|Disodium Laureth Sulfosuccinate|Coco-Glucoside|Decyl Glucoside|Lauryl Glucoside|Phenoxyethanol|Sodium Benzoate|Potassium Sorbate|Disodium EDTA|Sodium Chloride|Zinc PCA|Zinc Pyrithione|Titanium Dioxide|Ethylhexyl Methoxycinnamate|Ethylhexyl Salicylate|Homosalate|Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine|C12-15 Alkyl Benzoate|Acrylates/C10-30 Alkyl Acrylate Crosspolymer|Carbomer|Hydroxyethylcellulose|Polyquaternium-10|Ceteareth-20|Steareth-20|Poloxamer 184|Glyceryl Glucoside`.split('|').map(normalize));
 
   function item(value) {
     if (!value) return '';
