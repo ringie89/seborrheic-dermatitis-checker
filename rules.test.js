@@ -67,6 +67,72 @@ for (const [alias, reference, rating, group] of aliasCases) {
   assert.equal(rawVariant?.group || null, group, `${alias}: raw-label group is preserved`); assertions++;
 }
 assert.equal(R.rawAliasCount, 4, 'only the four approved raw aliases are registered'); assertions++;
+assert.equal(R.matchOne("Beeswax/Cera Alba/Cire d'abeille")?.match, 'Exact list', 'the complete known raw alias remains protected from slash decomposition'); assertions++;
+
+const castorSlashLabel = 'RICINUS COMMUNIS SEED OIL / CASTOR SEED OIL';
+assert.deepEqual(R.parseIngredients(castorSlashLabel), [castorSlashLabel], 'slash synonyms stay one original ingredient token'); assertions++;
+const castorSlashAnalysis = R.analyze(castorSlashLabel);
+assert.equal(castorSlashAnalysis.total, 1, 'slash synonyms count as one ingredient'); assertions++;
+assert.equal(castorSlashAnalysis.matches.length, 1, 'slash synonyms produce at most one finding'); assertions++;
+assert.equal(castorSlashAnalysis.matches[0].name, castorSlashLabel, 'a slash finding retains the original ingredient label'); assertions++;
+assert.equal(castorSlashAnalysis.matches[0].finding.rating, 3, 'the exact Ricinus component wins over the unknown Castor Seed Oil heuristic'); assertions++;
+assert.equal(castorSlashAnalysis.matches[0].finding.group, 'lipid'); assertions++;
+assert.match(castorSlashAnalysis.matches[0].finding.match, /Slash component "RICINUS COMMUNIS SEED OIL" \(Exact list\)/, 'the match identifies the exact slash component'); assertions++;
+assert.equal(R.parseIngredients(`${castorSlashLabel}, ${castorSlashLabel}`).length, 1, 'duplicate slash labels remain one deduplicated ingredient'); assertions++;
+const compactCastorSlash = 'RICINUS COMMUNIS SEED OIL/CASTOR SEED OIL';
+assert.deepEqual(R.parseIngredients(compactCastorSlash), [compactCastorSlash], 'slashes without surrounding spaces also stay within one ingredient'); assertions++;
+assert.equal(R.analyze(compactCastorSlash).matches[0]?.finding.rating, 3, 'compact slash labels receive the same component matching'); assertions++;
+
+const exactTieSlash = 'Glyceryl Stearate / Unlisted Seed Oil';
+for (const strict of [true, false]) {
+  const analysis = R.analyze(exactTieSlash, {strict});
+  assert.equal(analysis.highest, 2, `${strict ? 'Strict' : 'Balanced'} keeps the tied exact ester component`); assertions++;
+  assert.equal(analysis.matches[0]?.finding.group, 'ester', `${strict ? 'Strict' : 'Balanced'} exact component wins over full oilunknown heuristic`); assertions++;
+  assert.match(analysis.matches[0]?.finding.match || '', /Slash component "Glyceryl Stearate" \(Exact list\)/, 'the tie winner names the exact component'); assertions++;
+}
+
+for (const label of [
+  'Caprylic/Capric Triglyceride',
+  'Caprylic / Capric Triglyceride',
+  'Coco-Caprylate/Caprate',
+  'Coco-Caprylate / Caprate',
+  'C12-15 Alkyl Benzoate'
+]) {
+  const analysis = R.analyze(label);
+  assert.equal(analysis.total, 1, `${label}: preserved as one full label`); assertions++;
+  assert.equal(analysis.highest, 0, `${label}: full neutral chemistry is not overridden by a fragment heuristic`); assertions++;
+}
+for (const label of ['C10-30 Cholesterol/Lanosterol Esters','C10-30 Cholesterol / Lanosterol Esters']) {
+  const finding = R.matchOne(label);
+  assert.equal(finding?.rating, 2, `${label}: exact full ester remains 2/3`); assertions++;
+  assert.equal(finding?.group, 'ester', `${label}: exact full ester identity is retained`); assertions++;
+  assert.equal(finding?.match, 'Exact list', `${label}: a known full label is not reported as a component hit`); assertions++;
+}
+
+const mixedSlashLabel = 'Galactomyces Ferment Filtrate / Glyceryl Stearate';
+const strictMixedSlash = R.analyze(mixedSlashLabel);
+assert.equal(strictMixedSlash.total, 1, 'mixed slash labels count once in Strict'); assertions++;
+assert.equal(strictMixedSlash.highest, 3, 'Strict keeps the highest slash candidate'); assertions++;
+const balancedMixedSlash = R.analyze(mixedSlashLabel, {strict:false});
+assert.equal(balancedMixedSlash.total, 1, 'mixed slash labels count once in Balanced'); assertions++;
+assert.equal(balancedMixedSlash.highest, 2, 'Balanced filters hidden Galactomyces before choosing the highest visible candidate'); assertions++;
+assert.equal(balancedMixedSlash.matches.length, 1, 'Balanced returns one visible finding for the original item'); assertions++;
+assert.equal(balancedMixedSlash.matches[0].name, mixedSlashLabel, 'Balanced retains the full original slash label'); assertions++;
+assert.equal(balancedMixedSlash.matches[0].finding.group, 'ester', 'the visible ester is not lost behind hidden Galactomyces'); assertions++;
+assert.equal(balancedMixedSlash.matches[0].suppressed, null, 'the active ester is not marked suppressed'); assertions++;
+const allSuppressedSlash = R.analyze('Galactomyces Ferment Filtrate / Squalene', {strict:false}).ingredients[0];
+assert.equal(allSuppressedSlash.finding, null, 'Balanced hides a slash label when every candidate is suppressed'); assertions++;
+assert.equal(allSuppressedSlash.suppressed?.group, 'galactomyces', 'the highest suppressed slash candidate remains available for explanation'); assertions++;
+
+const volatileSlash = 'Oleic Acid / Citrus Limon Peel Oil';
+const volatileSlashFinding = R.analyze(volatileSlash).matches[0];
+assert.equal(volatileSlashFinding?.name, volatileSlash, 'a volatile-oil pattern on the full label cannot hide the other component'); assertions++;
+assert.equal(volatileSlashFinding?.finding.group, 'fatty'); assertions++;
+assert.equal(volatileSlashFinding?.finding.rating, 3); assertions++;
+assert.match(volatileSlashFinding?.finding.match || '', /Slash component "Oleic Acid" \(Exact list\)/, 'the known acid component is reported as the match source'); assertions++;
+assert.equal(R.matchOne('Unknown Ingredient (Galactomyces / Oleic Acid)'), null, 'slashes inside parentheses are not treated as ingredient boundaries'); assertions++;
+assert.equal(R.matchOne('Unknown (Galactomyces / Oleic Acid) / Glyceryl Stearate')?.rating, 2, 'only top-level slash components contribute candidates'); assertions++;
+
 const squaleneFinding = R.matchOne('Squalene');
 assert.equal(squaleneFinding?.group, 'mechanistic', 'Squalene has its own exact low-confidence group'); assertions++;
 assert.match(squaleneFinding?.reason || '', /non-peer-reviewed.*preprint.*single-strain/i, 'Squalene reason labels the single-strain preprint as not peer-reviewed'); assertions++;
@@ -120,7 +186,8 @@ assert.deepEqual(R.parseIngredients(microcrystallineCommaInput), ['Aqua','Cera M
 assert.deepEqual(R.analyze(microcrystallineCommaInput).matches.map(entry => entry.name), ['Oleic Acid']); assertions++;
 eq('Polysorbate-81',0,'unlisted hyphenated Polysorbate does not inherit the alias');
 eq('Polysorbate-80 Blend',0,'suffix is not matched as an alias');
-eq("Beeswax/Cera Alba/Cire d'abeille extract",0,'extended composite wax label is not matched by substring');
+eq("Beeswax/Cera Alba/Cire d'abeille extract",3,'extended composite wax label matches its exact Beeswax slash component');
+assert.equal(R.matchOne("Beeswax/Cera Alba/Cire d'abeille extract")?.group, 'lipid'); assertions++;
 eq('Butyrospermum Parkii (Unlisted Butter)',0,'unlisted parenthetical Shea variant remains unmatched');
 eq('Butyrospermum Parkii (Shea Butter) derivative',0,'suffix is not matched as the exact Shea alias');
 eq('Cera Microcristallina (Microcrystalline Wax,Cire Microcristalline) derivative',2,'extended Cera label falls through to the existing oilunknown heuristic');

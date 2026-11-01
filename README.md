@@ -31,7 +31,7 @@ The header contains three keyboard-accessible tabs: **Product checker**, **Ratin
 
 The overall rating equals the **highest individual caution level**, not a percentage or a medically validated flare-up prediction. The number of flagged ingredients is shown separately. **Strict screening** is enabled by default. **Balanced mode** hides all 1/3 flags, Galactomyces (3/3), and the 2/3 heuristic for unknown oil/wax names. Other 2/3 rules remain active. Neither mode clinically validates product safety.
 
-The checker includes **hundreds of ingredient names and aliases**, counted automatically in the app, plus name-pattern rules for certain esters, lipids, ferments, and Galactomyces ingredients. It cannot catalog every possible INCI term. Pattern rules can yield false positives or missed flags. **No match does not mean proven safe.**
+The checker includes **hundreds of ingredient names and aliases**, counted automatically in the app, plus name-pattern rules for certain esters, lipids, ferments, and Galactomyces ingredients. Slash-separated labels remain one displayed item; when the complete label is unknown, top-level slash components are also checked individually. Known exact, neutral, and explicitly listed volatile-oil full names take precedence over component heuristics. It cannot catalog every possible INCI term. Pattern rules can yield false positives or missed flags. **No match does not mean proven safe.**
 
 **Notable exceptions:** `Caprylic/Capric Triglyceride`, `Glyceryl Caprylate`, `Glyceryl Caprate`, `Squalane`, `Mineral Oil`, `Dimethicone`, many fatty alcohols, ceramides, and treatment ingredients such as `Ketoconazole` or `Piroctone Olamine` are not automatically marked as Malassezia nutrients.
 
@@ -64,7 +64,7 @@ There are no external dependencies.
 
 Four observed aliases and a later set of narrowly evidence-reviewed ingredient rules were changed after the manual comparison. The historical 1,432-label expected-results and comparison files remain frozen at the pre-correction state; current outcomes and scope are documented in [the evidence review](quality/INGREDIENT_EVIDENCE_REVIEW.md) and [comparison report](quality/SEZIA_COMPARISON.md). No general fuzzy or parenthetical matching rule was added.
 
-`benchmark.test.js` includes **50 ingredient-level comparison and edge cases, six real manufacturer-listed ingredient formulas, and two parsing tests**. Along with the 159 assertions in `rules.test.js` and the app-state checks in `app.test.js`, these are executable regression checks—not clinical accuracy estimates.
+`benchmark.test.js` includes **50 ingredient-level comparison and edge cases, six real manufacturer-listed ingredient formulas, and two parsing tests**. Along with the 269 assertions in `rules.test.js` and the app-state checks in `app.test.js`, these are executable regression checks—not clinical accuracy estimates.
 
 | Manufacturer-listed product | Strict rating | Flagged ingredients | Key findings |
 |---|---:|---:|---|

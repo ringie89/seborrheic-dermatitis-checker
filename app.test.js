@@ -90,15 +90,18 @@ async function main() {
   get('strictMode').checked = true;
   get('strictMode').dispatch('change');
 
-  get('ingredients').value = 'Oleic Acid';
+  const slashLabel = 'RICINUS COMMUNIS SEED OIL / CASTOR SEED OIL';
+  get('ingredients').value = slashLabel;
   get('ingredients').dispatch('input');
   assert.equal(get('ingredientCount').textContent, '1 ingredient detected');
   get('analyzeBtn').dispatch('click');
   assert.equal(get('results').hidden, false);
   assert.equal(get('scoreValue').textContent, '3/3');
+  assert.equal(get('allIngredients').children.length, 1, 'a slash label renders as one token');
+  assert.equal(get('allIngredients').children[0].textContent, slashLabel, 'the token retains the original slash label');
   await get('copyBtn').dispatch('click');
   assert.equal(writes.length, 1, 'a current assessment can be copied');
-  assert.match(writes[0], /Oleic Acid/);
+  assert.ok(writes[0].includes(slashLabel), 'the copied report retains the original slash label');
 
   get('ingredients').value = 'Aqua';
   get('ingredients').dispatch('input');
@@ -114,7 +117,7 @@ async function main() {
   await get('copyBtn').dispatch('click');
   assert.equal(writes.length, 2, 'the updated assessment can be copied');
   assert.match(writes[1], /Overall caution level: 0\/3/);
-  assert.doesNotMatch(writes[1], /Oleic Acid/);
+  assert.doesNotMatch(writes[1], /RICINUS COMMUNIS SEED OIL/);
 
   get('clearBtn').dispatch('click');
   assert.equal(get('ingredients').value, '');

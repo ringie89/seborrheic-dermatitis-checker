@@ -39,13 +39,15 @@ Lists may change; recheck packaging for current use. These are *ingredient-detec
 
 ## Reproduced tests
 
-- `node rules.test.js`: **219** pass, including the frozen-snapshot scope check.
-- `node app.test.js`: app-state checks pass, including stale-result invalidation and re-analysis after editing.
+- `node rules.test.js`: **269** pass, including the frozen-snapshot scope check and slash-label regressions.
+- `node app.test.js`: app-state checks pass, including stale-result invalidation, re-analysis after editing, and preserving one original slash label in the displayed token and copied report.
 - `node benchmark.test.js`: **58** pass, including six manufacturer formulas.
 - `node quality/sezia_examples.test.js`: **123** unique public Sezia examples, all pass according to published category-derived expected levels.
 - `node quality/real100.test.mjs`: Offline synthetic CLI checks pass for source/formula binding and malformed annotations.
 - `node quality/scenarios.test.js`: **100 synthetic full lists / 1,785 assertions** pass.
 - Headless Chromium 149 passed 20 desktop/mobile CDP assertions at 1440 × 1000 and 390 × 844; the root reviewer inspected the screenshots. Details and clipboard limits are in [the browser check](quality/BROWSER_CHECK.md).
+
+Slash-specific regressions keep the full source label as one item, check unknown top-level components, protect known exact and neutral full names, and select the highest candidate that remains active in each mode. The new behavior adds no Strict or Balanced changes to the frozen 1,432-label corpus.
 
 **Historical catalog and manual union results:** On 2026-11-01, `quality/real100.mjs` selected 100 historical catalog entries from 499 minimum-filter candidates (2,725 parsed ingredient positions). Its simplified published-category model produced 258 shared findings, 1 comparator-only finding, and 74 checker-only findings; these are not actual Sezia form results. One unchanged SRC-0035 public-form submission returned HTTP 200 with a generic visible error and no ingredient assessment; the cause is unknown. The historical formula-level Sezia measurement recorded **0/100** valid observations. The separately requested one-list ingredient-union output was received: 436 reported entries, 434 exact mappings and 2 shortened raw fragments. A later parenthesis-aware scan found one full payload candidate per fragment, without changing the raw Sezia text or frozen counts. This ingredient-name comparison does not validate complete product formulas. No live agreement or clinical accuracy percentage is claimed. See [the manual comparison](quality/SEZIA_COMPARISON.md) and [validation provenance](quality/VALIDATION_STATUS.md). The agreed manual union check is complete; 100 individual product-form submissions are not a follow-up requirement.
 

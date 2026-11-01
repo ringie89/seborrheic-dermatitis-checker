@@ -179,43 +179,122 @@
   const volatileOilNames = new Set(`Mentha Piperita Oil|Mentha Arvensis Leaf Oil|Eucalyptus Globulus Leaf Oil|Lavandula Angustifolia Oil|Melaleuca Alternifolia Leaf Oil|Tea Tree Oil|Citrus Limon Peel Oil|Citrus Aurantium Dulcis Peel Oil|Citrus Bergamia Peel Oil|Rosmarinus Officinalis Leaf Oil|Thymus Vulgaris Oil|Cymbopogon Citratus Leaf Oil|Peppermint Oil|Lavender Oil|Eucalyptus Oil|Rosemary Oil|Lemon Peel Oil|Bergamot Oil|Essential Oil|Salvia Officinalis Oil|Sage Oil|Citrus Aurantium Bergamia Fruit Oil|Bergamot Fruit Oil|Citrus Aurantifolia Oil|Lime Oil|Lavandula Hybrida Oil|Lavendin Oil|Pogostemon Cablin Oil`.split('|').map(normalize));
   const volatileOilPattern = /(?:leaf|peel|flower|herb|bark|wood|needle|flower bud)\s+oil$|^(?:tea tree|peppermint|eucalyptus|lavender|rosemary|bergamot|thyme|lemon|lemongrass)\s+(?:essential\s+)?oil$|\bessential oil$/;
 
-  function matchOne(value) {
+  function matchWhole(value) {
     const rawAlias = rawAliasKey(value);
     if (rawAliases.has(rawAlias)) {
-      return matchOne(rawAliases.get(rawAlias));
+      return {resolved:true, finding:matchWhole(rawAliases.get(rawAlias)).finding};
     }
     const key = normalize(value);
-    if (!key) return null;
-    if (exact.has(key)) return {...exact.get(key), match: 'Exact list'};
-    if (NEUTRAL.has(key)) return null;
-    if (volatileOilNames.has(key) || volatileOilPattern.test(key)) return null;
-    if (/galactomyces/i.test(key)) return {...GROUP.galactomyces, group:'galactomyces', match:'Name pattern'};
+    if (!key) return {resolved:true, finding:null};
+    if (exact.has(key)) return {resolved:true, finding:{...exact.get(key), match:'Exact list'}};
+    if (NEUTRAL.has(key)) return {resolved:true, finding:null};
+    // Only explicitly named volatile oils protect a complete slash label. The
+    // broader name pattern is still useful for individual components, but it
+    // must not hide a separate known ingredient elsewhere in the label.
+    if (volatileOilNames.has(key)) return {resolved:true, finding:null};
+    if (volatileOilPattern.test(key)) return {resolved:false, finding:null};
+    if (/galactomyces/i.test(key)) return {resolved:false, finding:{...GROUP.galactomyces, group:'galactomyces', match:'Name pattern'}};
     if (/(?:^|\s)(?:ferment(?:s|ed|ation)?|ferment filtrate|ferment extract|yeast|faex|saccharomyces)(?:\b|\/)/i.test(key)) {
       if (/(?:\boil\b|\bbutter\b|\bwax\b|\bfat\b|\bolein\b|\bcera\b)/i.test(key)) {
-        return {...GROUP.lipid, group:'lipid', rating:2, reason:'A fermented lipid-based ingredient. Its specific fatty acid composition is unknown; conservatively flagged for review.', basis:'Heuristic / precaution', match:'Name pattern'};
+        return {resolved:false, finding:{...GROUP.lipid, group:'lipid', rating:2, reason:'A fermented lipid-based ingredient. Its specific fatty acid composition is unknown; conservatively flagged for review.', basis:'Heuristic / precaution', match:'Name pattern'}};
       }
-      return {...GROUP.ferment, group:'ferment', match:'Name pattern'};
+      return {resolved:false, finding:{...GROUP.ferment, group:'ferment', match:'Name pattern'}};
     }
-    if (/^polysorbate\s*\d+$/i.test(key) || /^tween\s*\d+$/i.test(key)) return {...GROUP.ester, group:'ester', match:'Name pattern'};
-    if (acylTenside.test(key) || saltSuffix.test(key)) return {...GROUP.salt, group:'salt', match:'Name pattern'};
+    if (/^polysorbate\s*\d+$/i.test(key) || /^tween\s*\d+$/i.test(key)) return {resolved:false, finding:{...GROUP.ester, group:'ester', match:'Name pattern'}};
+    if (acylTenside.test(key) || saltSuffix.test(key)) return {resolved:false, finding:{...GROUP.salt, group:'salt', match:'Name pattern'}};
     if ((/\b(?:seed|kernel|fruit|nut|bran|vegetable)\s+(?:oil|butter|wax)\b/.test(key) || /\b(?:oil|butter|wax)$/.test(key) || /^cera\b/.test(key)) && !/\b(?:mineral oil|essential oil|paraffin oil)\b/.test(key)) {
-      return {...GROUP.oilunknown, group:'oilunknown', match:'Name pattern'};
+      return {resolved:false, finding:{...GROUP.oilunknown, group:'oilunknown', match:'Name pattern'}};
     }
-    if (/\b(?:glycerides?|triglycerides?)$/.test(key)) return {...GROUP.glycerides, group:'glycerides', match:'Name pattern'};
-    if (!nonEsterPrefix.test(key) && esterEnding.test(key)) return {...GROUP.ester, group:'ester', match:'Name pattern'};
-    if (/\b(?:isopropyl|cetyl|stearyl|glyceryl|glycol|sorbitan|polyglyceryl|peg-\d+|ethylhexyl|octyldodecyl)\b/.test(key) && /\b(?:oleate|stearate|palmitate|myristate|laurate|behenate|isostearate|olivate|cocoate|ricinoleate)\b/.test(key)) return {...GROUP.ester, group:'ester', match:'Name pattern'};
-    return null;
+    if (/\b(?:glycerides?|triglycerides?)$/.test(key)) return {resolved:false, finding:{...GROUP.glycerides, group:'glycerides', match:'Name pattern'}};
+    if (!nonEsterPrefix.test(key) && esterEnding.test(key)) return {resolved:false, finding:{...GROUP.ester, group:'ester', match:'Name pattern'}};
+    if (/\b(?:isopropyl|cetyl|stearyl|glyceryl|glycol|sorbitan|polyglyceryl|peg-\d+|ethylhexyl|octyldodecyl)\b/.test(key) && /\b(?:oleate|stearate|palmitate|myristate|laurate|behenate|isostearate|olivate|cocoate|ricinoleate)\b/.test(key)) return {resolved:false, finding:{...GROUP.ester, group:'ester', match:'Name pattern'}};
+    return {resolved:false, finding:null};
+  }
+
+  function splitTopLevelSlash(value) {
+    const text = String(value || '');
+    const parts = [];
+    let start = 0;
+    let depth = 0;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (ch === '(') { depth++; continue; }
+      if (ch === ')') { depth = Math.max(0, depth - 1); continue; }
+      if (ch === '/' && depth === 0) {
+        parts.push(text.slice(start, i).trim());
+        start = i + 1;
+      }
+    }
+    if (!parts.length) return null;
+    parts.push(text.slice(start).trim());
+    return parts.filter(Boolean);
+  }
+
+  function isSuppressed(finding, strict) {
+    return !!finding && !strict && (finding.rating === 1 || finding.group === 'galactomyces' || finding.group === 'oilunknown');
+  }
+
+  function chooseCandidate(candidates) {
+    return [...candidates].sort((a, b) =>
+      b.finding.rating - a.finding.rating ||
+      Number(b.exact) - Number(a.exact) ||
+      Number(a.source !== 'whole') - Number(b.source !== 'whole') ||
+      a.order - b.order
+    )[0] || null;
+  }
+
+  function resolveForMode(value, strict) {
+    const whole = matchWhole(value);
+    if (whole.resolved) {
+      return isSuppressed(whole.finding, strict)
+        ? {finding:null, suppressed:whole.finding}
+        : {finding:whole.finding, suppressed:null};
+    }
+
+    const components = splitTopLevelSlash(value);
+    if (!components) {
+      return isSuppressed(whole.finding, strict)
+        ? {finding:null, suppressed:whole.finding}
+        : {finding:whole.finding, suppressed:null};
+    }
+
+    const candidates = [];
+    let order = 0;
+    const addCandidate = (finding, source, label) => {
+      if (!finding) return;
+      const exactMatch = finding.match === 'Exact list';
+      candidates.push({
+        finding: source === 'component'
+          ? {...finding, match:`Slash component "${label}" (${finding.match || 'Rule'})`}
+          : finding,
+        source,
+        exact: exactMatch,
+        order:order++
+      });
+    };
+
+    addCandidate(whole.finding, 'whole');
+    for (const component of components) {
+      const result = matchWhole(component);
+      addCandidate(result.finding, 'component', component);
+    }
+
+    const active = candidates.filter(candidate => !isSuppressed(candidate.finding, strict));
+    if (active.length) return {finding:chooseCandidate(active).finding, suppressed:null};
+    if (candidates.length) return {finding:null, suppressed:chooseCandidate(candidates).finding};
+    return {finding:null, suppressed:null};
+  }
+
+  function matchOne(value) {
+    return resolveForMode(value, true).finding;
   }
 
   function analyze(raw, options = {}) {
     const strict = options.strict !== false;
     const names = parseIngredients(raw);
     const analyzed = names.map(name => {
-      const finding = matchOne(name);
-      if (finding && (!strict && (finding.rating === 1 || finding.group === 'galactomyces' || finding.group === 'oilunknown'))) {
-        return {name, finding: null, suppressed: finding};
-      }
-      return {name, finding, suppressed: null};
+      const result = resolveForMode(name, strict);
+      return {name, finding:result.finding, suppressed:result.suppressed};
     });
     const matches = analyzed.filter(x => !!x.finding);
     const counts = {high: matches.filter(x=>x.finding.rating===3).length, medium:matches.filter(x=>x.finding.rating===2).length, low:matches.filter(x=>x.finding.rating===1).length};

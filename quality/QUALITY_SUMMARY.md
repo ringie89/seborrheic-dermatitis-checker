@@ -6,8 +6,8 @@ Updated: 2026-11-01. The scope is limited to potential **Malassezia** or **sebor
 
 | Suite | Result | Meaning |
 |---|---|---|
-| `app.test.js` | Passed | App state, changed-input invalidation, copy behavior, re-analysis, and mode-note wording. |
-| `rules.test.js` | 219 assertions passed | Covers the four earlier aliases, the approved exact evidence cases, a frozen 1,432-label scope comparison (15 Strict / 6 Balanced changes relative to the historical snapshot), and negative controls. |
+| `app.test.js` | Passed | App state, changed-input invalidation, copy behavior, re-analysis, mode-note wording, and original slash-label display/copy. |
+| `rules.test.js` | 269 assertions passed | Covers slash labels as one item, unknown top-level components, known full-name protection, mode-aware candidate selection, the four earlier aliases, approved exact evidence cases, a frozen 1,432-label scope comparison (15 Strict / 6 Balanced changes relative to the historical snapshot), and negative controls. The slash change adds no frozen-corpus differences. |
 | `benchmark.test.js` | 58 cases passed | 50 individually selected names, 6 real manufacturer-listed full formulas, and 2 parsing tests. |
 | `quality/sezia_examples.test.js` | 123/123 passed | Unique examples copied from Sezia's *published category pages*; **not** actual Sezia live responses. |
 | `quality/real100.test.mjs` | Passed | Offline CLI checks with 100 explicitly synthetic CSV rows; source/formula hash validation, stale template preservation, and malformed annotation rejection. |

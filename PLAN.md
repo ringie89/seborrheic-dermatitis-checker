@@ -148,3 +148,18 @@ Der Nutzer hat die zuvor gewünschte Pause aufgehoben. Diese eng begrenzte Folge
 - [x] Klarstellen, dass 100 separate Produkt-Liveprüfungen kein Folgeauftrag sind; 0/100 bleibt ausschließlich das Ergebnis der historischen Messung.
 
 **Stand dieser Folgerunde:** Dokumentations- und Fragmentabgleich sowie Browserprüfung abgeschlossen. Keine Produktregeln und keine eingefrorenen Nutzer-/Payload-/Vergleichsdateien wurden geändert.
+
+### 9. Slashgetrennte Ingredient-Labels als Einzelposition prüfen
+
+**Status:** Implementiert, alle sechs lokalen Suiten bestanden und Root-Code-Review bestanden. Das Originaltoken bleibt eine einzige Ingredient-Position. Bekannte vollständige Raw-Aliase, exakte Regeln, explizite neutrale Namen und exakt gelistete volatile Ölnamen behalten Vorrang und werden nicht zerlegt. Bei sonstigen Slashketten werden nur Schrägstriche außerhalb von Klammern zusätzlich als Komponentengrenzen geprüft.
+
+- [x] Die Vollnamenheuristik und die nichtrekursive Komponentenprüfung auf derselben Ingredient-Position zusammenführen. Pro Position höchstens ein Finding zurückgeben und Originalname/-text für UI und Kopierbericht erhalten.
+- [x] Im Balanced-Modus je Vollnamen-/Komponentenkandidat zuerst Unterdrückung anwenden und danach unter den aktiven Kandidaten den höchsten Treffer wählen; falls nur unterdrückte Kandidaten existieren, die beste Unterdrückungserklärung behalten.
+- [x] Gleich hohe exakte Komponentenregeln gegenüber Vollnamenheuristiken bevorzugen; danach Vollname vor Komponente und Komponenten links nach rechts als stabilen Tie-Break verwenden. Slash-Komponententreffer im `match`-Hinweis kenntlich machen.
+- [x] Gezielte Regressionen für das Ricinus/Castor-Beispiel, enge und beabstandete Slash-Schreibweisen, bekannte neutrale/exakte Vollnamen, Klammergrenzen, Mehrfachkomponenten, Balanced-Treffer und Originalausgabe ergänzen.
+- [x] Vor Änderung der Test-Allowlist gegen `HEAD:rules.js` und alle 1.432 eingefrorenen Labels verglichen: **0 zusätzliche Strict- und 0 zusätzliche Balanced-Abweichungen**. Vorhandene Allowlist und alle Payload-, Expected-, Vergleichs- und Nutzerausgabedateien blieben unverändert.
+- [x] Alle sechs lokalen Suiten nach der finalen Testergänzung ausführen: `app.test.js`; `rules.test.js` (**269 Assertions / 439 Namen und Aliase**); `benchmark.test.js` (**58 Checks**); `quality/sezia_examples.test.js` (**123 eindeutige Beispiele**); `quality/scenarios.test.js` (**100 synthetische Listen / 1.785 Assertions**); `quality/real100.test.mjs` (**100 synthetische Offline-CSV-Zeilen**). Kein neuer Browserlauf: Der App-Renderer blieb unverändert; die frühere Desktop-/Mobile-Prüfung bleibt historisch dokumentiert.
+
+**Abnahmekriterien:** Eine Slashkette zählt und erscheint als eine Position; Treffer benennen weiter das Originaltoken. Bekannte vollständige neutrale/exakte chemische Namen können durch Fragmente nicht überschrieben werden. Unter gemischten Slash-Treffern gewinnt der höchste im jeweiligen Modus aktive Kandidat; Balanced blendet keinen niedrigeren sichtbaren Treffer aus, nur weil eine andere Komponente unterdrückt wird. Alle Frozen-Korpus-Abweichungen sind vor der Allowlist-Änderung reviewed und erklärt.
+
+**Abnahme:** Implementierung und Regressionen abgeschlossen. Die sechs lokalen Suiten bestehen; der isolierte Frozen-Korpusvergleich fand keine zusätzlichen Strict-/Balanced-Abweichungen. Root-Code-Review bestanden. Commit-/Push-Umfang ist auf genau die acht freigegebenen Dateien begrenzt; Snapshots und Nutzerdaten bleiben ausgeschlossen.
