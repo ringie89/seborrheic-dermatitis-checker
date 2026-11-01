@@ -14,11 +14,11 @@ Updated: 2026-11-01. The scope is limited to potential **Malassezia** or **sebor
 | `quality/scenarios.test.js` | 100 synthetic full lists / 1,785 assertions | Reproducible rule regression test; no clinical ground truth. |
 | Desktop/mobile Chromium | Historical reported pass; not rerun in this update | Form input, scores, scope exclusion, mode switching, mobile width. |
 | Historical catalog scan | 100 entries / 2,725 parsed ingredient positions | Executed on 2026-11-01; source selection and limitations below. This is not live Sezia validation. |
-| Live Sezia head-to-head | 0/100 valid formula-level observations; 0/1 manual batches confirmed | The SRC-0035 form attempt returned HTTP 200 with a generic error and no result list; cause unknown. The user-requested union query is prepared but unanswered. |
+| Live Sezia head-to-head | 0/100 valid formula-level observations; 1/1 manual union outputs received | The earlier SRC-0035 form attempt returned HTTP 200 with a generic error and no ingredient assessment; cause unknown. The separate user-returned union output is mapped below and does not validate product formulas. |
 
-## Prepared manual union query
+## Returned manual union comparison
 
-A single copy-ready payload contains **1,432** distinct labels (35,256 characters), with provenance and per-label local strict/balanced findings in quality/sezia_manual_expected.json. Its payload SHA-256 is 5244c9a78e26505b0ec6a47ce9d9b4093227eb42222d952b8b5c13591f8a27ae. The local expected ratings are checker outputs, not Sezia observations. The batch has not been answered: **0/1 confirmed manual responses**. See [the manual guide](SEZIA_MANUAL_GUIDE.md) and [payload](SEZIA_INGREDIENTS.txt).
+A single copy-ready payload contains **1,432** distinct labels (35,256 characters), with provenance and per-label local strict/balanced findings in `sezia_manual_expected.json`. Its payload SHA-256 is `5244c9a78e26505b0ec6a47ce9d9b4093227eb42222d952b8b5c13591f8a27ae`. The returned Sezia output reports 436 entries: **434 exact label matches and 2 unresolved fragments**. It has no visible Unverified section. See the complete label-level comparison and mismatch lists in [SEZIA_COMPARISON.md](SEZIA_COMPARISON.md) and [sezia_manual_comparison.json](sezia_manual_comparison.json). Local expected ratings are checker outputs, not Sezia observations. This is one ingredient-union response, not product-formula validation; historical formula-level live coverage remains **0/100**. Possible output truncation and rule-review candidates remain open. See [the manual guide](SEZIA_MANUAL_GUIDE.md) and [payload](SEZIA_INGREDIENTS.txt).
 ## How to run tests
 
 ```bash
