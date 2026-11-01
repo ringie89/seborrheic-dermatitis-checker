@@ -13,9 +13,12 @@ Updated: 2026-11-01. The scope is limited to potential **Malassezia** or **sebor
 | `quality/real100.test.mjs` | Passed | Offline CLI checks with 100 explicitly synthetic CSV rows; source/formula hash validation, stale template preservation, and malformed annotation rejection. |
 | `quality/scenarios.test.js` | 100 synthetic full lists / 1,785 assertions | Reproducible rule regression test; no clinical ground truth. |
 | Desktop/mobile Chromium | Historical reported pass; not rerun in this update | Form input, scores, scope exclusion, mode switching, mobile width. |
-| Live Sezia head-to-head | Not done (0/100) | Needs actual interactive observations to measure agreement. |
-| 100 real archived commercial formulas | Runner provided, not executed here | `quality/real100.mjs` requires external catalog download or offline CSV. |
+| Historical catalog scan | 100 entries / 2,725 parsed ingredient positions | Executed on 2026-11-01; source selection and limitations below. This is not live Sezia validation. |
+| Live Sezia head-to-head | 0/100 valid formula-level observations; 0/1 manual batches confirmed | The SRC-0035 form attempt returned HTTP 200 with a generic error and no result list; cause unknown. The user-requested union query is prepared but unanswered. |
 
+## Prepared manual union query
+
+A single copy-ready payload contains **1,432** distinct labels (35,256 characters), with provenance and per-label local strict/balanced findings in quality/sezia_manual_expected.json. Its payload SHA-256 is 5244c9a78e26505b0ec6a47ce9d9b4093227eb42222d952b8b5c13591f8a27ae. The local expected ratings are checker outputs, not Sezia observations. The batch has not been answered: **0/1 confirmed manual responses**. See [the manual guide](SEZIA_MANUAL_GUIDE.md) and [payload](SEZIA_INGREDIENTS.txt).
 ## How to run tests
 
 ```bash
@@ -38,3 +41,7 @@ node quality/real100.mjs --input Prod1.csv --output-dir audit-output
 ```
 
 Data source: [historical skincareAPI public dataset](https://github.com/LauraAddams/skincareAPI/blob/master/db/seed_data/Prod1.csv). Products/formulas may be outdated. Its report compares with a simplified independent model of Sezia's public categories, **not** with the live checker. To measure true agreement, capture verified Sezia live output for the exact same products and fill the generated source-hash-specific annotation template. Every row must retain its `source_sha256` and `formula_sha256`; the runner rejects missing, stale, unknown, or duplicate records. Annotation rows and notes must be single-line CSV fields. A 0/3 score only means no current rule matched; it is not proof of safety or clinical suitability.
+
+### Historical scan results (2026-11-01)
+
+The runner selected 100 historical catalog entries from 499 minimum-filter candidates and parsed 2,725 ingredient positions (9–62 per entry). The simplified published-category comparator reported 258 shared findings, 1 comparator-only finding, and 74 checker-only findings (99.6% recall and 77.7% precision proxies against that model only). These percentages are **not** live agreement, ground truth, or clinical accuracy. The dataset is not manually verified as complete/current INCI. Its `master` source URL is mutable; source SHA-256 is `672ec3278dbcc220e65fa543203353c2bf4954c6450ffbca6b5572504f870d2a`. A hash-matched source snapshot is kept in ignored `quality/real-product-audit-output/Prod1.csv` and is not committed because redistribution rights are unclear. The report's `as_of` is its generation time, not an exact source-download timestamp. See [the complete validation status](VALIDATION_STATUS.md) for parsing limitations, candidates for review, and the current 0/100 live-observation coverage.

@@ -60,7 +60,7 @@ There are no external dependencies.
 
 ## Sezia methodology benchmark (2026-11-01)
 
-**Important validation distinction:** Sezia's interactive search form was not accessible for live form submissions during this review. Its **published ingredient categories, matching requirements, and examples** were reviewed directly, and Seborrheic Dermatitis Product Checker's results were compared to the categories they imply. The benchmark therefore is **not a measured head-to-head live scan** and cannot establish an overall percentage agreement with Sezia.
+**Important validation distinction:** Sezia's public homepage and published ratings page responded to read-only requests. One ordinary public-form submission returned HTTP 200 with a generic error message and no ingredient results. The comparison in this section uses Sezia's **published ingredient categories, matching requirements, and examples**; it is **not a measured head-to-head live scan** and cannot establish an overall percentage agreement with Sezia. Current valid product-formula coverage is 0/100; the separate union query has 0/1 confirmed responses. See [the external validation status](quality/VALIDATION_STATUS.md).
 
 `benchmark.test.js` includes **50 ingredient-level comparison and edge cases, six real manufacturer-listed ingredient formulas, and two parsing tests**. Along with the 98 assertions in `rules.test.js` and the app-state checks in `app.test.js`, these are executable regression checks—not clinical accuracy estimates.
 
@@ -116,9 +116,9 @@ All ingredient analysis runs locally in the browser. Ingredient lists are not se
 
 This is an independently written project, unaffiliated with Sezia. The code is provided under the MIT License (see `LICENSE`).
 
-## Quality audit (100 complete INCI challenge lists)
+## Quality audit (synthetic scenarios and historical catalog scan)
 
-The project now ships 100 **synthetic** complete INCI lists with explicit expected ingredients and ratings, plus a reproducible workflow that can fetch and scan 100 **genuine historical commercial formula lists**. These are two different datasets, and neither provides clinical accuracy estimates.
+The project includes 100 **synthetic** ingredient lists with explicit expected results. Separately, the historical catalog runner was executed on 2026-11-01: it selected 100 historical catalog entries from 499 candidates and parsed 2,725 ingredient positions. These are not manually verified complete or current package INCI lists. The simplified published-category comparison reported 258 shared, 1 comparator-only, and 74 checker-only findings; these are not live Sezia results or clinical accuracy estimates. No valid archived-formula Sezia observations exist (0/100), and the proposed one-list manual comparison has no returned result (0/1). Use the copy-ready 1,432-label union at quality/SEZIA_INGREDIENTS.txt and the guide at quality/SEZIA_MANUAL_GUIDE.md. See [the validation status and provenance](quality/VALIDATION_STATUS.md).
 
 ```bash
 node rules.test.js
@@ -130,7 +130,7 @@ node quality/real100.test.mjs  # Offline synthetic annotation-integrity CLI test
 node quality/real100.mjs    # Requires internet, or pass --input Prod1.csv
 ```
 
-See **[Quality methodology and results](quality/QUALITY_SUMMARY.md)** for tested counts, caveats, reference-data sources, and the annotation procedure required for **real** Sezia.co side-by-side observations. Annotation templates are tied to the exact source CSV and each formula by SHA-256; legacy or stale annotations are rejected. Notes and annotation rows must stay on one physical line. GitHub Actions includes regression testing and a manually triggered real-formula audit.
+See **[Quality methodology and results](quality/QUALITY_SUMMARY.md)** for tested counts, caveats, reference-data sources, and the annotation procedure required for **real** Sezia.co side-by-side observations. Annotation templates are tied to the exact source CSV and each formula by SHA-256; legacy or stale annotations are rejected. Notes and annotation rows must stay on one physical line. GitHub Actions includes regression testing and a manually triggered historical-formula audit.
 
 ## Voluntary use disclaimer
 

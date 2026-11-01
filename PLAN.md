@@ -54,7 +54,7 @@ Die bestätigten Probleme in der lokalen Produktprüfung und in der Benchmark-Ve
 
 **Abnahme:** Alle lokalen Regressionen bestehen; Abweichungen und nicht ausgeführte externe/UI-Prüfungen sind explizit dokumentiert. Der Reviewer kann die Änderungen anhand des Diffs und der Testausgaben nachvollziehen.
 
-**Lokaler Schritt-3-Stand:** `node app.test.js`, `node rules.test.js` (**98**), `node benchmark.test.js` (**58**), `node quality/sezia_examples.test.js` (**123 eindeutige Beispiele**), `node quality/scenarios.test.js` (**100 synthetische Listen / 1.785 Assertions**) und `node quality/real100.test.mjs` (Offline-CLI-Integration mit **100 ausdrücklich synthetischen CSV-Zeilen**) bestanden. Root-Review für Schritte 2 und 3 bestanden. Chromium wurde nicht erneut ausgeführt; historische Produktdaten und Sezia-Livevergleiche wurden nicht abgerufen oder ausgeführt.
+**Lokaler Schritt-3-Stand:** `node app.test.js`, `node rules.test.js` (**98**), `node benchmark.test.js` (**58**), `node quality/sezia_examples.test.js` (**123 eindeutige Beispiele**), `node quality/scenarios.test.js` (**100 synthetische Listen / 1.785 Assertions**) und `node quality/real100.test.mjs` (Offline-CLI-Integration mit **100 ausdrücklich synthetischen CSV-Zeilen**) bestanden. Root-Review für Schritte 2 und 3 bestanden. Chromium wurde nicht erneut ausgeführt; historische Produktdaten und Sezia-Livevergleiche wurden in Schritt 3 nicht abgerufen oder ausgeführt. Der historische Katalogscan wurde separat in Schritt 5a ausgeführt; ein gültiges Live-Ergebnis liegt weiterhin nicht vor.
 
 ### 4. GitHub anbinden und ersten Push durchführen
 
@@ -67,17 +67,19 @@ Die bestätigten Probleme in der lokalen Produktprüfung und in der Benchmark-Ve
 
 **Statushinweis:** Repository-URL und lokale Git-Identität liegen vor. Die Sichtbarkeit bleibt wegen HTTP 404 der unauthentifizierten Metadatenabfrage unbestätigt; es wurde keine Sichtbarkeit geändert.
 
-### 5. Spätere externe Validierung: historische Formeln und Sezia live
+### 5. Spätere externe Validierung: historische Formeln und manuelle Sezia-Sammelabfrage
 
-- [ ] Als getrennten späteren Schritt entscheiden, ob der historische 100-Formeln-Lauf durchgeführt werden soll. Datensatz, Abrufdatum beziehungsweise lokale Quelldatei und SHA-256, Auswahlregel, Parsergrenzen und erzeugte Resultate dokumentieren.
-- [ ] Für einen echten Sezia-Vergleich dieselben exakt dokumentierten Zutatenlisten manuell in Sezia prüfen und die tatsächlich beobachteten Resultate formularstabil annotieren. Keine aus veröffentlichten Kategorien abgeleiteten oder vermuteten Antworten als Live-Ergebnisse eintragen.
-- [ ] Abdeckung, fehlende Beobachtungen und Zählermetriken mit Nennern ausweisen. Historische Daten, veraltete Formeln, nicht ausgeführte Scans und fehlende Sezia-Beobachtungen klar kennzeichnen.
-- [ ] Resultate separat reviewen und klar als Ingredient-Matching-Vergleich ausweisen, nicht als klinische Validierung oder persönliche Verträglichkeitsprognose.
+- [x] Den historischen 100-Formeln-Lauf ausführen und Datensatz, Abrufdatum, lokale Quelldatei und SHA-256, Auswahlregel, Parsergrenzen und Resultate dokumentieren. Es wurden 100 historische Katalogeinträge nach dem Mindestfilter ausgewählt (499 Kandidaten, 2.725 geparste Ingredient-Positionen); das sind keine manuell verifizierten vollständigen oder aktuellen INCI-Listen.
+- [ ] Nach Nutzerwunsch eine einzelne Sammelliste aus quality/SEZIA_INGREDIENTS.txt manuell bei Sezia prüfen. Nur vollständig beobachtete Treffer samt Kategorie/Einstufung/Erklärung oder eine ausdrückliche Bestätigung „Keine Treffer angezeigt“ gelten als Antwort. Aktuell: 0/1 bestätigte manuelle Sammelantwort. Die frühere Einzelprobe SRC-0035 lieferte HTTP 200 mit generischer Fehlermeldung und keinem Ergebnis; Ursache unklar. Keine 100/100-Produktabdeckung behaupten.
+- [ ] Abdeckung des manuellen Sammelchecks mit Nenner ausweisen. Derzeit liegen 0/1 bestätigte manuelle Sammelantworten vor; die historische Formelabdeckung bleibt davon getrennt bei 0/100 gültigen Live-Ergebnissen.
+- [x] Historischen Scan und dessen Grenzen separat reviewen; als Ingredient-Matching-Vergleich ausweisen, nicht als klinische Validierung oder persönliche Verträglichkeitsprognose. Root-Review des historischen Ergebnisses bestanden.
 
-**Abnahme:** Reproduzierbare Herkunft und vollständige Zuordnung der verglichenen Rezepturen sind belegt. Live-Sezia-Metriken enthalten ausschließlich tatsächlich erhobene Beobachtungen; nicht erhobene Ergebnisse bleiben ausdrücklich offen. Es wird keine klinische Genauigkeit behauptet.
+**Abnahme:** Herkunft und Zuordnung jeder Bezeichnung in der Sammelliste sind nachvollziehbar. Eine manuelle Antwort enthält ausschließlich tatsächlich angezeigte Sezia-Treffer oder eine ausdrückliche Nulltreffer-Bestätigung. Das Ergebnis beschreibt die gemeinsame Namensmenge, nicht 100 vollständige Produktformeln, eine weltweite INCI-Abdeckung oder klinische Genauigkeit.
 
-**Offene Voraussetzung:** Diese externe Validierung ist nicht Teil der Implementierungsschritte 1–3 und beginnt erst nach deren Review als separat dokumentierter Schritt.
+**Ergebnis Schritt 5a:** Der historische Kataloglauf ist dokumentiert in [quality/VALIDATION_STATUS.md](quality/VALIDATION_STATUS.md). Die vereinfachte veröffentlichte Kategorien-Übereinstimmung (258 gemeinsam, 1 nur im Comparator, 74 nur im Checker) ist kein Live-Sezia-Vergleich. Der Quelldatensatz ist lokal hashgesichert, aber wegen ungeklärter Weiterverbreitungsrechte nicht eingecheckt. Es wurden keine Produktregeln geändert.
+
+**Offener Schritt 5b:** Die öffentliche Homepage und Ratings-Seite waren per GET erreichbar. Die einmalige SRC-0035-Formularprobe endete mit HTTP 200, aber einer generischen sichtbaren Fehlermeldung und keinem Ergebnis; Ursache unbekannt. Auf Nutzerwunsch ist eine einzelne 1.432-Label-Sammelliste vorbereitet. Sie wurde noch nicht manuell beantwortet; bestätigt sind 0/1 Sammelresultate. Die Dateien und Anleitung stehen unter quality/SEZIA_INGREDIENTS.txt und quality/SEZIA_MANUAL_GUIDE.md. Schritt 5 bleibt offen.
 
 ## Änderungsgrenze dieses Plans
 
-Schritte 1 bis 4 sind umgesetzt, lokal geprüft beziehungsweise veröffentlicht und vom Root-Reviewer freigegeben. Schritt 4 wurde als Commit `9b4beea` nach `origin/main` gepusht; die Repository-Sichtbarkeit ist unbestätigt und blieb unverändert. Die externe Chromium-Prüfung wurde nicht wiederholt; historische Produktdaten und Sezia-Livevergleiche wurden nicht abgerufen oder ausgeführt. Schritt 5 bleibt eine separate spätere Validierung.
+Schritte 1 bis 4 sind umgesetzt, lokal geprüft beziehungsweise veröffentlicht und vom Root-Reviewer freigegeben. Schritt 4 wurde als Commit `9b4beea` nach `origin/main` gepusht; die Repository-Sichtbarkeit ist unbestätigt und blieb unverändert. Die externe Chromium-Prüfung wurde nicht wiederholt. Schritt 5a (historischer Katalogscan) ist abgeschlossen und reviewed. Der Nutzer wählte eine manuelle Sammelabfrage mit quality/SEZIA_INGREDIENTS.txt (1.432 Labels, 35.256 Zeichen); 100 einzelne Live-Produktprüfungen sind kein Abnahmekriterium mehr. Offen sind die vollständige Sezia-Ausgabe, Zuordnung pro Label mit sezia_manual_expected.json, Prüfung auf Abschneiden und separater Review. Bestätigte manuelle Batchresultate: 0. Dieser Ingredient-Matching-Vergleich ist kein Produktparsing.
