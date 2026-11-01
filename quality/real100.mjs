@@ -82,7 +82,7 @@ function publishedCategory(label){
   if(!SHORT_CHAIN.has(k) && ESTER_TAIL.test(k) && !/^(sodium|potassium|magnesium|zinc|ammonium) /.test(k))return 'esters';
   return null;
 }
-const MALASSEZIA=new Set(['fatty','lipid','ester','phospholipid','galactomyces','ferment','salt','oilunknown','glycerides']);
+const MALASSEZIA=new Set(['fatty','lipid','ester','phospholipid','galactomyces','ferment','salt','oilunknown','glycerides','mechanistic']);
 function skinKey(x){return R.normalize(x)}
 function examine(p){
   const scan=R.analyze(p.inci);

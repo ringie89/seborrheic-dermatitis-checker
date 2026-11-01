@@ -35,9 +35,9 @@ Die folgenden 13 Sezia-Labels hatten im ursprünglichen Snapshot keine lokale St
 | `olive oil unsaponifiables` | Lipids |
 | `squalene` | Lipids |
 
-## Priorisierte Reviewkandidaten
+## Priorisierte Reviewkandidaten zum Zeitpunkt des Snapshots
 
-Diese Beobachtungen sind Prüfhinweise, keine automatische Regeländerung oder abschließende Bewertung:
+Die folgenden Beobachtungen waren zum Zeitpunkt des manuellen Snapshots Prüfhinweise, keine automatische Regeländerung oder abschließende Bewertung:
 
 - **Im Snapshot nachweisbare lokale Überwarnung durch Alias-/Musterlücke:** `Cera Microcristallina (Microcrystalline Wax,Cire Microcristalline)` erhielt 2/3 als `oilunknown`, während das alleinstehende `Microcrystalline Wax` in `NEUTRAL` liegt. Die historischen Treffer stammen aus `SRC-0408` und `SRC-0443`; die neutrale Schreibweise aus `SRC-0134`. Dieser konkrete Aliasfall ist in der späteren Korrektur unten behoben.
 - **Formulierungsabhängiger Review:** `PEG-7 Caprylic/Capric Glycerides` erhält 2/3 als generisches `glycerides`-Muster; `Caprylic/Capric Triglyceride` ist dagegen neutral. Die Namen bezeichnen unterschiedliche Stoffe/Formulierungen. Daraus folgt weder eine Entwarnung noch ein bestätigter Trigger.
@@ -59,10 +59,14 @@ Nach dem Root-Review wurden ausschließlich vier exakt beobachtete Schreibweisen
 | `Butyrospermum Parkii (Shea Butter)` | 0/3 | 3/3 `lipid`, wie `Shea Butter` |
 | `Cera Microcristallina (Microcrystalline Wax,Cire Microcristalline)` | 2/3 `oilunknown` | 0/3, wie `Microcrystalline Wax` (`NEUTRAL`) |
 
-Ein Korpusvergleich gegen die eingefrorenen 1.432 lokalen Erwartungslabels fand genau vier Strict- und drei Balanced-Änderungen an Rating/Gruppe. Die Balanced-Einstufung des Cera-Microcristallina-Labels war bereits 0/3, weil die frühere `oilunknown`-Heuristik dort unterdrückt wurde; die neue Neutralbehandlung entfernt diese heuristische Unterdrückung ohne Änderung des sichtbaren Balanced-Ratings. Die offenen Vergleichsfälle in diesem Bericht wurden nicht neu eingestuft.
+Ein Korpusvergleich gegen die eingefrorenen 1.432 lokalen Erwartungslabels fand für diesen Alias-Schritt genau vier Strict- und drei Balanced-Änderungen an Rating/Gruppe. Die Balanced-Einstufung des Cera-Microcristallina-Labels war bereits 0/3, weil die frühere `oilunknown`-Heuristik dort unterdrückt wurde; die neue Neutralbehandlung entfernt diese heuristische Unterdrückung ohne Änderung des sichtbaren Balanced-Ratings. Dieser Absatz beschreibt ausschließlich den damaligen Alias-Schritt.
+
+### Spätere fachlich geprüfte Regelentscheidungen
+
+Nach separater Prüfung wurden weitere exakte Labels enger bewertet: `Squalene` erhält einen vorläufigen 1/3-Mechanismushinweis nur in Strict; `PEG-7 Caprylic/Capric Glycerides` wird neutral; zwei dokumentierte komplexe Ester bleiben in der bestehenden 2/3-Estergruppe; belegte volatile Öl-Aliase werden exakt von der unbekannten Ölheuristik ausgenommen. Die unveränderten Bewertungen mehrerer anderer Reviewlabels und die Gründe sind im [gemeinsamen Evidenzreview](INGREDIENT_EVIDENCE_REVIEW.md) dokumentiert. Dies aktualisiert keine historischen Sezia-Beobachtungen.
 
 `SEZIA_INGREDIENTS.txt`, `sezia_manual_expected.json`, `sezia_manual_comparison.json` und die Nutzerquelle blieben bytegleich. Der Generator `sezia_manual.mjs` lehnt geänderte Ableitungen jetzt vor sämtlichen Datei-Schreibvorgängen mit „historical snapshot is kept unchanged“ ab. Der einmalige Guardlauf endete erwartungsgemäß am veränderten Expected-Snapshot; Payload, Expected, Vergleich, Anleitung und Nutzerquelle behielten ihre Vorher-Hashes.
 
 ## Grenzen und nächster Schritt
 
-Der einzelne Sammelvergleich bleibt eine 1/1 manuelle Antwort; die historische Formelvalidierung bleibt separat bei 0/100 gültigen Live-Ergebnissen. Zwei Fragmente, mögliche Ausgabeabschneidung und die offenen fachlichen Fälle müssen weiter geprüft werden. Die lokale Auswertung enthält keine klinische Ground Truth und sagt nichts über die Verträglichkeit eines konkreten Produkts aus.
+Der einzelne Sammelvergleich bleibt eine 1/1 manuelle Antwort; die historische Formelvalidierung bleibt separat bei 0/100 gültigen Live-Ergebnissen. Zwei Fragmente und mögliche Ausgabeabschneidung bleiben Grenzen der zurückgegebenen Liste. Der 421/13/132-Vergleich ist der eingefrorene Stand vor diesen Regeländerungen und keine aktuelle Agreement-Messung. Die lokale Auswertung enthält keine klinische Ground Truth und sagt nichts über die Verträglichkeit eines konkreten Produkts aus.

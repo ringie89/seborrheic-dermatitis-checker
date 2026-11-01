@@ -15,6 +15,7 @@ This website screens cosmetic ingredients **only** for potential associations wi
 | 2/3 | Fatty acid esters, long-chain glycerides, complex lipids | May liberate long-chain fatty acids, but hydrolysis and effect vary by ester, species, formulation and dose. |
 | 1/3 | Sezia unverified fatty-acid-related salts/acyl compounds | Explicitly low confidence, optional strict screening. |
 | 1/3 | Selected fermented/yeast-derived ingredients | Sezia-inspired caution about microbiome interactions; direct Malassezia/SD relevance is **not established**. Only included in strict mode. |
+| 1/3 | Exact `Squalene` label | Preliminary mechanistic Malassezia evidence, including a non-peer-reviewed single-strain in-vitro report; not evidence that a Squalene-containing product causes seborrheic dermatitis. Strict mode only. |
 | 0/3 | All other names | No active Malassezia/SD matching rule. **Not a medical assurance of tolerance.** |
 
 **Strict mode** includes all listed flags. **Balanced mode** suppresses all 1/3 flags, Galactomyces (3/3), and the 2/3 heuristic for unknown oil/wax names; other 2/3 rules remain active.
@@ -38,7 +39,7 @@ Lists may change; recheck packaging for current use. These are *ingredient-detec
 
 ## Reproduced tests
 
-- `node rules.test.js`: **159** pass.
+- `node rules.test.js`: **219** pass, including the frozen-snapshot scope check.
 - `node app.test.js`: app-state checks pass, including stale-result invalidation and re-analysis after editing.
 - `node benchmark.test.js`: **58** pass, including six manufacturer formulas.
 - `node quality/sezia_examples.test.js`: **123** unique public Sezia examples, all pass according to published category-derived expected levels.
@@ -48,7 +49,7 @@ Lists may change; recheck packaging for current use. These are *ingredient-detec
 
 **Historical scan performed; formula-level live comparison remains open:** On 2026-11-01, `quality/real100.mjs` selected 100 historical catalog entries from 499 minimum-filter candidates (2,725 parsed ingredient positions). Its simplified published-category model produced 258 shared findings, 1 comparator-only finding, and 74 checker-only findings; these are not actual Sezia form results. One unchanged SRC-0035 public-form submission returned HTTP 200 with a generic visible error and no ingredient assessment; the cause is unknown. Valid formula-level Sezia observations remain **0/100**. A separate user-returned ingredient-union output was received and compared: 436 reported entries, 434 exact mappings and 2 unresolved fragments. The label-level differences and review candidates are in [the manual comparison](quality/SEZIA_COMPARISON.md); this is not product-formula validation. No live agreement or clinical accuracy percentage is claimed. See [validation provenance and status](quality/VALIDATION_STATUS.md).
 
-After the frozen manual comparison, four exact observed aliases were aligned with their existing reference outcomes. The original payload, expected-label file, and comparison JSON remain unchanged; see the separate “Korrekturen nach dem Snapshot” section in the report. Open cases were not reclassified.
+After the frozen manual comparison, four observed aliases and the evidence-reviewed labels in [the current evidence review](quality/INGREDIENT_EVIDENCE_REVIEW.md) received narrow current-rule updates. The original payload, expected-label file, and comparison JSON remain unchanged; the historical 421/13/132 counts still describe that pre-update snapshot and are not current agreement metrics.
 
 ## References
 

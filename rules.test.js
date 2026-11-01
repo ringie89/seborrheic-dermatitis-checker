@@ -1,6 +1,7 @@
 'use strict';
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const path = require('node:path');
 const R = require('./rules.js');
 let assertions = 0;
 const eq = (name, expected, label) => {
@@ -16,13 +17,14 @@ const positive = [
   ['Polysorbate 20',2],['PEG-40 Hydrogenated Castor Oil',2],
   ['PEG-150 Pentaerythrityl Tetrastearate',2],['Ethylhexyl Palmitate',2],
   ['Hydrogenated Jojoba Oil',2],['Moringa Macassar Seed Oil',2],
+  ['Squalene',1],['C10-30 Cholesterol/Lanosterol Esters',2],['Hydrolyzed Jojoba Esters',2],
   ['Galactomyces Ferment Filtrate',3], ['Lactobacillus Ferment Lysate',1],
   ['Saccharomyces/Rice Ferment Filtrate',1],
   ['Sodium Lauroyl Sarcosinate',1],['Sodium Methyl Cocoyl Taurate',1]
 ];
 const negative = [
   'Aqua','Water','Squalane','Mineral Oil','Paraffinum Liquidum','Petrolatum',
-  'Caprylic/Capric Triglyceride','Glyceryl Caprylate','Glyceryl Caprate',
+  'Caprylic/Capric Triglyceride','PEG-7 Caprylic/Capric Glycerides','Glyceryl Caprylate','Glyceryl Caprate',
   'Coco-Caprylate','Dimethicone','PEG-40 Dimethicone','Stearyl Alcohol',
   'Cetyl Alcohol','Cetearyl Alcohol','Behenyl Alcohol','Ceramide NP',
   'Ketoconazole','Piroctone Olamine','Sodium Laureth Sulfate','Coco-Glucoside',
@@ -65,6 +67,54 @@ for (const [alias, reference, rating, group] of aliasCases) {
   assert.equal(rawVariant?.group || null, group, `${alias}: raw-label group is preserved`); assertions++;
 }
 assert.equal(R.rawAliasCount, 4, 'only the four approved raw aliases are registered'); assertions++;
+const squaleneFinding = R.matchOne('Squalene');
+assert.equal(squaleneFinding?.group, 'mechanistic', 'Squalene has its own exact low-confidence group'); assertions++;
+assert.match(squaleneFinding?.reason || '', /non-peer-reviewed.*preprint.*single-strain/i, 'Squalene reason labels the single-strain preprint as not peer-reviewed'); assertions++;
+assert.equal(squaleneFinding?.source, 'https://pubmed.ncbi.nlm.nih.gov/36789756/', 'Squalene flag links to the primary oxidation study'); assertions++;
+assert.equal(R.matchOne('  SQUALENE  ')?.group, 'mechanistic', 'exact Squalene matching tolerates case and outer whitespace'); assertions++;
+assert.equal(R.analyze('Squalene').highest, 1, 'Squalene is a 1/3 Strict-only finding'); assertions++;
+const balancedSqualene = R.analyze('Squalene', {strict:false}).ingredients[0];
+assert.equal(R.analyze('Squalene', {strict:false}).highest, 0, 'Balanced suppresses the low-confidence Squalene flag'); assertions++;
+assert.equal(balancedSqualene.suppressed?.group, 'mechanistic', 'Balanced suppression retains the finding explanation'); assertions++;
+assert.equal(R.matchOne('Squalene derivative'), null, 'Squalene does not use substring matching'); assertions++;
+const squaleneAndSqualane = R.analyze('Squalene, Squalane');
+assert.deepEqual(squaleneAndSqualane.matches.map(x=>x.name), ['Squalene'], 'Squalene flag is separate from neutral Squalane'); assertions++;
+assert.equal(squaleneAndSqualane.ingredients[1].finding, null, 'Squalane stays neutral beside flagged Squalene'); assertions++;
+eq('PEG-7 Caprylic/Capric Glyceride',2,'nearby singular glyceride does not inherit the exact neutral exception');
+assert.equal(R.matchOne('PEG-7 Caprylic/Capric Glyceride')?.group, 'glycerides'); assertions++;
+assert.equal(R.matchOne('PEG-7 Glyceryl Cocoate')?.group, 'ester', 'unrelated PEG esters keep their existing rule'); assertions++;
+for (const [label, group] of [
+  ['C10-30 Cholesterol/Lanosterol Esters','ester'],
+  ['Hydrolyzed Jojoba Esters','ester']
+]) {
+  assert.equal(R.matchOne(label)?.rating, 2, `${label}: exact 2/3 ester classification`); assertions++;
+  assert.equal(R.matchOne(label)?.group, group, `${label}: remains in the existing ester group`); assertions++;
+}
+assert.equal(R.matchOne('C10-30 Cholesterol/Lanosterol Esters')?.source, 'https://kcia.or.kr/cid/search/ingd_view.php?no=3088', 'C10-30 ester outcome links to its ingredient identity definition'); assertions++;
+assert.match(R.matchOne('C10-30 Cholesterol/Lanosterol Esters')?.reason || '', /chain distribution.*not established/i, 'C10-30 reason does not assume a long-chain fraction'); assertions++;
+assert.match(R.matchOne('Hydrolyzed Jojoba Esters')?.reason || '', /composition and availability.*not established/i, 'jojoba override preserves composition and usability uncertainty'); assertions++;
+assert.equal(R.matchOne('Hydrolyzed Jojoba Esters derivative'), null, 'extended jojoba label is not matched by substring'); assertions++;
+const volatileExactLabels = [
+  'Salvia Officinalis Oil','Sage Oil','Salvia Officinalis (Sage) Oil','Sage (Salvia Officinalis) Oil',
+  'Citrus Aurantium Bergamia Fruit Oil','Bergamot Fruit Oil',
+  'Citrus Aurantium Bergamia (Bergamot) Fruit Oil','Bergamot (Citrus Aurantium Bergamia) Fruit Oil',
+  'Citrus Aurantifolia Oil','Lime Oil','Lime (Citrus Aurantifolia) Oil',
+  'Lavandula Hybrida Oil','Lavendin Oil','Lavendin (Lavandula Hybrida) Oil','Pogostemon Cablin Oil'
+];
+for (const label of volatileExactLabels) {
+  assert.equal(R.matchOne(label), null, `${label}: documented volatile-oil identity is not assigned oilunknown`); assertions++;
+}
+for (const [label, rating, group] of [
+  ['Salvia Officinalis Seed Oil',2,'oilunknown'],
+  ['Sage Seed Oil',2,'oilunknown'],
+  ['Bergamot Seed Oil',2,'oilunknown'],
+  ['Citrus Aurantifolia Seed Oil',2,'oilunknown'],
+  ['Salvia Hispanica Seed Oil',3,'lipid'],
+  ['Citrus Auranthium Bergamia (Bergamot) Fruit Oil',2,'oilunknown']
+]) {
+  assert.equal(R.matchOne(label)?.rating || 0, rating, `${label}: non-whitelisted/seed/typo baseline rating`); assertions++;
+  assert.equal(R.matchOne(label)?.group || null, group, `${label}: non-whitelisted/seed/typo baseline group`); assertions++;
+}
 const microcrystallineCommaInput = 'Aqua, Cera Microcristallina (Microcrystalline Wax,Cire Microcristalline), Oleic Acid';
 assert.deepEqual(R.parseIngredients(microcrystallineCommaInput), ['Aqua','Cera Microcristallina (Microcrystalline Wax,Cire Microcristalline)','Oleic Acid']); assertions++;
 assert.deepEqual(R.analyze(microcrystallineCommaInput).matches.map(entry => entry.name), ['Oleic Acid']); assertions++;
@@ -76,7 +126,7 @@ eq('Butyrospermum Parkii (Shea Butter) derivative',0,'suffix is not matched as t
 eq('Cera Microcristallina (Microcrystalline Wax,Cire Microcristalline) derivative',2,'extended Cera label falls through to the existing oilunknown heuristic');
 assert.equal(R.matchOne('Cera Microcristallina (Microcrystalline Wax,Cire Microcristalline) derivative')?.group, 'oilunknown'); assertions++;
 
-const historicalManualSnapshot = JSON.parse(fs.readFileSync('quality/sezia_manual_expected.json', 'utf8'));
+const historicalManualSnapshot = JSON.parse(fs.readFileSync(path.join(__dirname,'quality/sezia_manual_expected.json'), 'utf8'));
 const strictSnapshotChanges = [];
 const balancedSnapshotChanges = [];
 const snapshotLabelsWithMultipleTokens = [];
@@ -98,14 +148,27 @@ for (const entry of historicalManualSnapshot.ingredients) {
   }
 }
 assert.deepEqual(snapshotLabelsWithMultipleTokens, [], 'frozen ingredient labels parse as one token for mode comparison'); assertions++;
-assert.deepEqual(strictSnapshotChanges.sort(), aliasCases.map(([alias]) => rawLabelKey(alias)).sort(), 'only the four approved aliases change Strict results across the frozen 1,432-label set'); assertions++;
-assert.deepEqual(balancedSnapshotChanges.sort(), aliasCases.slice(0,3).map(([alias]) => rawLabelKey(alias)).sort(), 'only the three positive aliases change Balanced results across the frozen 1,432-label set'); assertions++;
+const approvedStep7StrictChanges = [
+  'Squalene','PEG-7 Caprylic/Capric Glycerides','C10-30 Cholesterol/Lanosterol Esters','Hydrolyzed Jojoba Esters',
+  'Salvia Officinalis (Sage) Oil','Sage (Salvia Officinalis) Oil',
+  'Citrus Aurantium Bergamia (Bergamot) Fruit Oil','Bergamot (Citrus Aurantium Bergamia) Fruit Oil',
+  'Lime (Citrus Aurantifolia) Oil','Lavendin (Lavandula Hybrida) Oil','Pogostemon Cablin Oil'
+].map(rawLabelKey);
+const approvedStep7BalancedChanges = [
+  'PEG-7 Caprylic/Capric Glycerides','C10-30 Cholesterol/Lanosterol Esters','Hydrolyzed Jojoba Esters'
+].map(rawLabelKey);
+assert.deepEqual(strictSnapshotChanges.sort(), [...aliasCases.map(([alias]) => rawLabelKey(alias)), ...approvedStep7StrictChanges].sort(), 'frozen Strict changes are limited to the four prior aliases and the approved Squalene, PEG-7, ester, and volatile-oil labels'); assertions++;
+assert.deepEqual(balancedSnapshotChanges.sort(), [...aliasCases.slice(0,3).map(([alias]) => rawLabelKey(alias)), ...approvedStep7BalancedChanges].sort(), 'frozen Balanced changes are limited to the three prior positive aliases plus exact PEG-7 and ester labels'); assertions++;
 
 for (const [label, rating, group] of [
-  ['Squalene',0,null],
+  ['Squalene',1,'mechanistic'],
   ['Polyhydroxystearic Acid',0,null],
   ['Milk Protein',0,null],
-  ['PEG-7 Caprylic/Capric Glycerides',2,'glycerides']
+  ['Milk Protein Extract',0,null],
+  ['Goat Milk Extract',0,null],
+  ['Olive Oil Unsaponifiables',0,null],
+  ['PEG-7 Caprylic/Capric Glycerides',0,null],
+  ['Squalane',0,null]
 ]) {
   const finding = R.matchOne(label);
   assert.equal(finding?.rating || 0, rating, `${label}: unresolved review baseline rating`); assertions++;

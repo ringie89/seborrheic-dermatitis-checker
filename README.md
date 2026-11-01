@@ -26,7 +26,7 @@ The header contains three keyboard-accessible tabs: **Product checker**, **Ratin
 
 - **3/3 – High caution:** Explicitly listed C11–C24 free fatty acids, many botanical oils and butters, and Galactomyces in strict screening. This is a precautionary flag, **not proof of a clinical trigger**.
 - **2/3 – Moderate caution:** Fatty acid esters and uncertain complex lipids of potential Malassezia relevance.
-- **1/3 – Low-confidence flag:** Sezia-listed unverified fatty-acid-related salts/acyl compounds and selected ferments (uncertain microbiome link).
+- **1/3 – Low-confidence flag:** Sezia-listed unverified fatty-acid-related salts/acyl compounds, selected ferments, and an exact `Squalene` flag based on a preliminary in-vitro Malassezia mechanism. These flags appear only in Strict mode; they do not establish a clinical product trigger.
 - **0/3 – No rule matches:** No implemented rule flagged an ingredient. **This is not a safety guarantee.**
 
 The overall rating equals the **highest individual caution level**, not a percentage or a medically validated flare-up prediction. The number of flagged ingredients is shown separately. **Strict screening** is enabled by default. **Balanced mode** hides all 1/3 flags, Galactomyces (3/3), and the 2/3 heuristic for unknown oil/wax names. Other 2/3 rules remain active. Neither mode clinically validates product safety.
@@ -62,7 +62,7 @@ There are no external dependencies.
 
 **Important validation distinction:** Sezia's public homepage and published ratings page responded to read-only requests. One ordinary public-form submission returned HTTP 200 with a generic error message and no ingredient assessment. The comparison in this section uses Sezia's **published ingredient categories, matching requirements, and examples**; it is **not** a measured head-to-head live scan and cannot establish an overall percentage agreement with Sezia. Valid product-formula coverage remains 0/100. The separate manual union output was received and compared: 436 reported entries, 434 exact labels mapped, and 2 unresolved fragments. See [the comparison](quality/SEZIA_COMPARISON.md) and [external validation status](quality/VALIDATION_STATUS.md).
 
-Four explicitly observed ingredient aliases have since been aligned with their existing reference labels. The historical 1,432-label expected-results and comparison files remain frozen at the pre-correction state; the separate current outcomes are documented in the comparison report. No general fuzzy or parenthetical matching rule was added.
+Four observed aliases and a later set of narrowly evidence-reviewed ingredient rules were changed after the manual comparison. The historical 1,432-label expected-results and comparison files remain frozen at the pre-correction state; current outcomes and scope are documented in [the evidence review](quality/INGREDIENT_EVIDENCE_REVIEW.md) and [comparison report](quality/SEZIA_COMPARISON.md). No general fuzzy or parenthetical matching rule was added.
 
 `benchmark.test.js` includes **50 ingredient-level comparison and edge cases, six real manufacturer-listed ingredient formulas, and two parsing tests**. Along with the 159 assertions in `rules.test.js` and the app-state checks in `app.test.js`, these are executable regression checks—not clinical accuracy estimates.
 
@@ -108,6 +108,8 @@ This website is not a diagnostic tool, medical treatment advice, or a guarantee 
 - [Sezia – Unverified ingredients](https://www.sezia.co/ingredients/unverified) — salts and other ingredient classes with inadequate evidence.
 - [Mayser & Koch (2021), PubMed](https://pubmed.ncbi.nlm.nih.gov/34304284/) — topical lipids can have varying, including inhibitory, effects.
 - [Experimental study (2025), PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC12416284/) — metabolism depends on the lipid and yeast species.
+- [Malassezia restricta-mediated lipoperoxidation (2023), PubMed](https://pubmed.ncbi.nlm.nih.gov/36789756/) — mechanistic evidence about squalene oxidation products, not a product trial.
+- [Malassezia furfur skin-lipid study (2026 preprint), PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC13405305/) — explicitly not peer-reviewed; preliminary in-vitro result.
 - [Review of seborrheic dermatitis (2025), PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC11942342/) — oleic acid and the skin barrier.
 - [American Academy of Dermatology – Seborrheic dermatitis self-care](https://www.aad.org/public/diseases/a-z/seborrheic-dermatitis-self-care)
 - [American Academy of Dermatology – Seborrheic dermatitis treatment](https://www.aad.org/public/diseases/a-z/seborrheic-dermatitis-treatment)
@@ -132,7 +134,7 @@ node quality/real100.test.mjs  # Offline synthetic annotation-integrity CLI test
 node quality/real100.mjs    # Requires internet, or pass --input Prod1.csv
 ```
 
-See **[Quality methodology and results](quality/QUALITY_SUMMARY.md)** for tested counts, caveats, reference-data sources, and the annotation procedure required for **real** Sezia.co side-by-side observations. Annotation templates are tied to the exact source CSV and each formula by SHA-256; legacy or stale annotations are rejected. Notes and annotation rows must stay on one physical line. GitHub Actions includes regression testing and a manually triggered historical-formula audit.
+See **[Quality methodology and results](quality/QUALITY_SUMMARY.md)** and the [ingredient evidence review](quality/INGREDIENT_EVIDENCE_REVIEW.md) for tested counts, caveats, source boundaries, and current screening decisions. Annotation templates are tied to the exact source CSV and each formula by SHA-256; legacy or stale annotations are rejected. Notes and annotation rows must stay on one physical line. GitHub Actions includes regression testing and a manually triggered historical-formula audit.
 
 ## Voluntary use disclaimer
 

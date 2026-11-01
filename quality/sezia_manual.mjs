@@ -16,8 +16,8 @@ function loadFixture(relative, append = '') {
   const moduleObject = {exports: {}};
   const processState = {exitCode: 0};
   const quietConsole = {log() {}, warn() {}, error() {}};
-  const run = new Function('module', 'exports', 'require', 'process', 'console', read(relative) + append);
-  run(moduleObject, moduleObject.exports, createRequire(pathToFileURL(filename)), processState, quietConsole);
+  const run = new Function('module', 'exports', 'require', 'process', 'console', '__dirname', '__filename', read(relative) + append);
+  run(moduleObject, moduleObject.exports, createRequire(pathToFileURL(filename)), processState, quietConsole, path.dirname(filename), filename);
   assert.equal(processState.exitCode, 0, relative + ' fixture checks');
   return moduleObject.exports.__manualFixtures || moduleObject.exports;
 }

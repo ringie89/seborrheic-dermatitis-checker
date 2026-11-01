@@ -21,7 +21,8 @@
     research: 'https://pubmed.ncbi.nlm.nih.gov/34304284/',
     research2025: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC12416284/',
     treatment: 'https://www.aad.org/public/diseases/a-z/seborrheic-dermatitis-treatment',
-    science: 'https://simpleskincarescience.com/pityrosporum-folliculitis-treatment-malassezia-cure/'
+    science: 'https://simpleskincarescience.com/pityrosporum-folliculitis-treatment-malassezia-cure/',
+    squaleneMechanism: 'https://pubmed.ncbi.nlm.nih.gov/36789756/'
   });
 
   const GROUP = Object.freeze({
@@ -32,6 +33,7 @@
     galactomyces: {rating: 3, name: 'Galactomyces', reason: 'A yeast-derived ingredient flagged by Sezia in strict screening. Direct clinical evidence that it worsens seborrheic dermatitis is insufficient.', basis: 'Sezia-inspired precaution / uncertain', source: SOURCES.galactomyces},
     ferment: {rating: 1, name: 'Ferment — uncertain Malassezia relevance', reason: 'Sezia includes some non-lipid ferments in a cautious microbiome-related category. A direct effect on Malassezia or seborrheic dermatitis has not been established. Included only in strict mode.', basis: 'Malassezia link uncertain / Sezia precaution', source: SOURCES.ferment},
     salt: {rating: 1, name: 'Unverified Malassezia-related salt', reason: 'Sezia lists this type of fatty-acid-derived salt or acyl compound as unverified. Whether it supplies usable fatty acids to Malassezia or worsens seborrheic dermatitis is unknown. Included only in strict mode.', basis: 'Unverified Malassezia concern', source: SOURCES.unsure},
+    mechanistic: {rating: 1, name: 'Preliminary Malassezia mechanism', reason: 'A non-peer-reviewed 2026 preprint reports a single-strain in-vitro hyphal signal with Squalene; published studies link Squalene oxidation products to dandruff models. This does not show that a cosmetic product containing Squalene causes seborrheic dermatitis. Included only in strict mode.', basis: 'Preliminary mechanism / uncertain', source: SOURCES.squaleneMechanism},
     oilunknown: {rating: 2, name: 'Oil or wax — check composition', reason: 'Looks like an oil-, wax-, or butter-based lipid. Its specific composition is not covered by the known ingredient list.', basis: 'Heuristic / unverified', source: SOURCES.lipids},
     glycerides: {rating: 2, name: 'Unspecified glyceride blend', reason: 'May contain glycerides of long-chain fatty acids. Since the fatty acid distribution is not stated, this is a formulation-dependent precaution, not a proven trigger.', basis: 'Uncertain lipid composition', source: SOURCES.lipids}
   });
@@ -82,6 +84,19 @@
   // usually uses the chemically meaningful 'Dihomo-Gamma-Linolenic Acid'.
   add('Dihomo-Y-Linolenic Acid', 'fatty', {reason:'Alias used in Sezia public examples for a C20 long-chain fatty acid; standardized ingredient names may differ. Precaution only.'});
 
+  // Evidence-reviewed exact entries; do not infer from substrings or suffixes.
+  add('Squalene', 'mechanistic');
+  add('C10-30 Cholesterol/Lanosterol Esters', 'ester', {
+    reason:'An ester blend of cholesterol/lanosterol with C10-C30 fatty acids. The chain distribution and Malassezia availability of this specific ingredient are not established. This is a cautious 2/3 ester-category flag, not a proven dermatitis trigger.',
+    basis:'Ester blend / uncertain composition',
+    source:'https://kcia.or.kr/cid/search/ingd_view.php?no=3088'
+  });
+  add('Hydrolyzed Jojoba Esters', 'ester', {
+    reason:'Hydrolyzed jojoba esters are a hydrolysate/mixture of long-chain lipid components. Their composition and availability to Malassezia are not established. This is a cautious 2/3 ester-category flag, not evidence that the ingredient worsens seborrheic dermatitis.',
+    basis:'Uncertain hydrolysate / ester precaution',
+    source:'https://www.cir-safety.org/sites/default/files/115_buff3f_suppl.pdf'
+  });
+
   // Additional lipid/glyceride blends found in real INCI lists. Their precise
   // long-chain fraction cannot be inferred from the name alone.
   add('Hydrogenated Palm Glycerides Citrate|Hydrogenated Palm Glycerides|Hydrogenated Soy Glycerides|C12-18 Triglycerides|C10-18 Triglycerides|Coco-Glycerides|Olive Glycerides|Vegetable Glycerides', 'glycerides');
@@ -89,7 +104,7 @@
 
   // Do not infer feeding from the fact an INCI contains "oil", "glyceryl", "alcohol" etc.
   // Explicit whitelist prevents common false positives in the generic fallback.
-  const NEUTRAL = new Set(`Aqua|Water|Glycerin|Glycerol|Butylene Glycol|Pentylene Glycol|Propanediol|Squalane|Squalene|Mineral Oil|Paraffinum Liquidum|Petrolatum|Paraffin|Ozokerite|Microcrystalline Wax|Synthetic Wax|Hydrogenated Polyisobutene|Coconut Alkanes|Isostearyl Neopentanoate|Diisostearyl Malate|Diethylhexyl Malate|Caprylic/Capric Triglyceride|Capric/Caprylic Triglyceride|Medium Chain Triglycerides|MCT Oil|Caprylic Acid|Capric Acid|Glyceryl Caprylate|Glyceryl Caprate|Coco-Caprylate|Coco-Caprylate/Caprate|Ethylhexylglycerin|Caprylyl Glycol|Cetearyl Alcohol|Cetyl Alcohol|Stearyl Alcohol|Behenyl Alcohol|Myristyl Alcohol|Arachidyl Alcohol|Dimethicone|Amodimethicone|Cyclopentasiloxane|PEG-12 Dimethicone|PEG-8 Dimethicone|PEG-40 Dimethicone|Niacinamide|Panthenol|Allantoin|Urea|Sodium Hyaluronate|Hyaluronic Acid|Ceramide NP|Ceramide AP|Ceramide EOP|Ceramide NS|Cholesterol|Sodium PCA|Betaine|Piroctone Olamine|Ketoconazole|Ciclopirox Olamine|Ciclopirox|Selenium Sulfide|Salicylic Acid|Citric Acid|Lactic Acid|Sodium Laureth Sulfate|Disodium Laureth Sulfosuccinate|Coco-Glucoside|Decyl Glucoside|Lauryl Glucoside|Phenoxyethanol|Sodium Benzoate|Potassium Sorbate|Disodium EDTA|Sodium Chloride|Zinc PCA|Zinc Pyrithione|Titanium Dioxide|Ethylhexyl Methoxycinnamate|Ethylhexyl Salicylate|Homosalate|Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine|C12-15 Alkyl Benzoate|Acrylates/C10-30 Alkyl Acrylate Crosspolymer|Carbomer|Hydroxyethylcellulose|Polyquaternium-10|Ceteareth-20|Steareth-20|Poloxamer 184|Glyceryl Glucoside`.split('|').map(normalize));
+  const NEUTRAL = new Set(`Aqua|Water|Glycerin|Glycerol|Butylene Glycol|Pentylene Glycol|Propanediol|Squalane|PEG-7 Caprylic/Capric Glycerides|Mineral Oil|Paraffinum Liquidum|Petrolatum|Paraffin|Ozokerite|Microcrystalline Wax|Synthetic Wax|Hydrogenated Polyisobutene|Coconut Alkanes|Isostearyl Neopentanoate|Diisostearyl Malate|Diethylhexyl Malate|Caprylic/Capric Triglyceride|Capric/Caprylic Triglyceride|Medium Chain Triglycerides|MCT Oil|Caprylic Acid|Capric Acid|Glyceryl Caprylate|Glyceryl Caprate|Coco-Caprylate|Coco-Caprylate/Caprate|Ethylhexylglycerin|Caprylyl Glycol|Cetearyl Alcohol|Cetyl Alcohol|Stearyl Alcohol|Behenyl Alcohol|Myristyl Alcohol|Arachidyl Alcohol|Dimethicone|Amodimethicone|Cyclopentasiloxane|PEG-12 Dimethicone|PEG-8 Dimethicone|PEG-40 Dimethicone|Niacinamide|Panthenol|Allantoin|Urea|Sodium Hyaluronate|Hyaluronic Acid|Ceramide NP|Ceramide AP|Ceramide EOP|Ceramide NS|Cholesterol|Sodium PCA|Betaine|Piroctone Olamine|Ketoconazole|Ciclopirox Olamine|Ciclopirox|Selenium Sulfide|Salicylic Acid|Citric Acid|Lactic Acid|Sodium Laureth Sulfate|Disodium Laureth Sulfosuccinate|Coco-Glucoside|Decyl Glucoside|Lauryl Glucoside|Phenoxyethanol|Sodium Benzoate|Potassium Sorbate|Disodium EDTA|Sodium Chloride|Zinc PCA|Zinc Pyrithione|Titanium Dioxide|Ethylhexyl Methoxycinnamate|Ethylhexyl Salicylate|Homosalate|Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine|C12-15 Alkyl Benzoate|Acrylates/C10-30 Alkyl Acrylate Crosspolymer|Carbomer|Hydroxyethylcellulose|Polyquaternium-10|Ceteareth-20|Steareth-20|Poloxamer 184|Glyceryl Glucoside`.split('|').map(normalize));
 
   function item(value) {
     if (!value) return '';
@@ -161,7 +176,7 @@
 
   // Volatile aromatic/essential oils must NOT be flagged merely because their name contains "oil".
   // This tool does not assess nonspecific irritation or contact allergy.
-  const volatileOilNames = new Set(`Mentha Piperita Oil|Mentha Arvensis Leaf Oil|Eucalyptus Globulus Leaf Oil|Lavandula Angustifolia Oil|Melaleuca Alternifolia Leaf Oil|Tea Tree Oil|Citrus Limon Peel Oil|Citrus Aurantium Dulcis Peel Oil|Citrus Bergamia Peel Oil|Rosmarinus Officinalis Leaf Oil|Thymus Vulgaris Oil|Cymbopogon Citratus Leaf Oil|Peppermint Oil|Lavender Oil|Eucalyptus Oil|Rosemary Oil|Lemon Peel Oil|Bergamot Oil|Essential Oil`.split('|').map(normalize));
+  const volatileOilNames = new Set(`Mentha Piperita Oil|Mentha Arvensis Leaf Oil|Eucalyptus Globulus Leaf Oil|Lavandula Angustifolia Oil|Melaleuca Alternifolia Leaf Oil|Tea Tree Oil|Citrus Limon Peel Oil|Citrus Aurantium Dulcis Peel Oil|Citrus Bergamia Peel Oil|Rosmarinus Officinalis Leaf Oil|Thymus Vulgaris Oil|Cymbopogon Citratus Leaf Oil|Peppermint Oil|Lavender Oil|Eucalyptus Oil|Rosemary Oil|Lemon Peel Oil|Bergamot Oil|Essential Oil|Salvia Officinalis Oil|Sage Oil|Citrus Aurantium Bergamia Fruit Oil|Bergamot Fruit Oil|Citrus Aurantifolia Oil|Lime Oil|Lavandula Hybrida Oil|Lavendin Oil|Pogostemon Cablin Oil`.split('|').map(normalize));
   const volatileOilPattern = /(?:leaf|peel|flower|herb|bark|wood|needle|flower bud)\s+oil$|^(?:tea tree|peppermint|eucalyptus|lavender|rosemary|bergamot|thyme|lemon|lemongrass)\s+(?:essential\s+)?oil$|\bessential oil$/;
 
   function matchOne(value) {

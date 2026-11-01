@@ -28,7 +28,7 @@ function expectFailure(result,pattern,label){
 
 try {
   const header=['product_id','source_sha256','formula_sha256','reviewed','flagged_ingredients','notes'];
-  const inci='Aqua, Glycerin, Panthenol, Niacinamide, Sodium Chloride, Citric Acid, Allantoin, Oleic Acid, Dimethicone';
+  const inci='Aqua, Glycerin, Panthenol, Niacinamide, Sodium Chloride, Citric Acid, Allantoin, Oleic Acid, Dimethicone, Squalene';
   const csv=['brand,name,inci',...Array.from({length:100},(_,i)=>`Synthetic Test Brand,Synthetic Fixture ${String(i+1).padStart(3,'0')},${inci}`)].join('\n')+'\n';
   const input=path.join(root,'synthetic-products.csv');
   const outputDir=path.join(root,'output');
@@ -43,6 +43,8 @@ try {
   assert.equal(new Set(result.products.map(p=>p.formula_sha256)).size,1,'identical synthetic formulas share one formula hash');
   const sourceHash=result.source_sha256;
   const product=result.products[0];
+  assert.ok(product.checker_all.some(x=>x.name==='Squalene'&&x.rating===1&&x.category==='mechanistic'),'the Squalene mechanism is included in the checker results');
+  assert.ok(!product.out_of_scope_flags.includes('Squalene'),'the Malassezia audit scope recognizes the mechanistic group');
   const templatePath=path.join(outputDir,`sezia_observations_template-${sourceHash}.csv`);
   assert.equal(fs.existsSync(templatePath),true,'source-bound annotation template was generated');
 
